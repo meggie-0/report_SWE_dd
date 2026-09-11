@@ -1,0 +1,2118 @@
+% =========================================================
+% ROAd App - DD Document
+% Compile with: pdfLaTeX
+% Required image folders:
+%   Images/
+%   Images/diagrams/
+% =========================================================
+
+\documentclass[11pt,a4paper,oneside]{report}
+
+% -
+% Language and typography
+% -
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{microtype}
+
+% Modern sans-serif style, close to the clean tech feeling of the logo.
+\usepackage[scaled=0.96]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{sfmath}
+\usepackage{amssymb} % needed for \blacktriangleright
+
+% -
+% Page layout
+% -
+\usepackage[a4paper,top=2.4cm,bottom=2.5cm,left=2.4cm,right=2.4cm,headheight=24pt]{geometry}
+\usepackage{setspace}
+\setstretch{1.08}
+\raggedbottom
+\emergencystretch=2em
+
+% -
+% Graphics, colors, boxes
+% -
+\usepackage{graphicx}
+\graphicspath{{Images/}{Images/diagrams/}}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{tikz}
+\usepackage[most]{tcolorbox}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+
+% -
+% ROAd palette sampled from the logo
+% -
+\definecolor{RoadNavy}{RGB}{6,19,40}
+\definecolor{RoadDeepBlue}{RGB}{19,35,113}
+\definecolor{RoadBlue}{RGB}{33,54,202}
+\definecolor{RoadPurple}{RGB}{86,61,230}
+\definecolor{RoadGrey}{RGB}{110,116,135}
+\definecolor{RoadSoft}{RGB}{244,246,255}
+\definecolor{RoadLine}{RGB}{188,191,214}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=RoadDeepBlue,
+    citecolor=RoadBlue,
+    urlcolor=RoadPurple
+}
+
+% -
+% Header and footer
+% -
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{RoadGrey}{\nouppercase{\leftmark}}}
+\rhead{\textcolor{RoadGrey}{}}
+\cfoot{\textcolor{RoadGrey}{\thepage\,/\,\pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{RoadLine}\leaders\hrule height \headrulewidth\hfill}}
+
+\fancypagestyle{plain}{%
+    \fancyhf{}
+    \cfoot{\textcolor{RoadGrey}{\thepage\,/\,\pageref{LastPage}}}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+% -
+% Chapter and section style
+% -
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{RoadNavy}}
+  {\filleft\fontsize{58}{58}\selectfont\color{RoadBlue}\thechapter}
+  {-0.7em}
+  {\titlerule[1.2pt]\vspace{1.0em}\Huge}
+  [\vspace{0.4em}{\color{RoadPurple}\titlerule[1.2pt]}]
+
+\titlespacing*{\chapter}{0pt}{-0.5cm}{1.1cm}
+
+\titleformat{\section}
+  {\Large\bfseries\color{RoadNavy}}
+  {\tikz[baseline=(char.base)]{\node[shape=rectangle,rounded corners=2pt,inner sep=4pt,fill=RoadNavy,text=white] (char) {\thesection};}}
+  {0.8em}
+  {}
+
+\titleformat{\subsection}
+  {\large\bfseries\color{RoadDeepBlue}}
+  {\thesubsection}
+  {0.7em}
+  {}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{RoadPurple}}
+  {\thesubsubsection}
+  {0.7em}
+  {}
+
+% -
+% Captions
+% -
+\captionsetup{
+    labelfont={bf,color=RoadNavy},
+    textfont={color=RoadGrey},
+    font=small,
+    justification=centering
+}
+
+% -
+% Lists
+% -
+\setlist[itemize]{
+    leftmargin=1.4em,
+    itemsep=0.25em,
+    topsep=0.25em,
+    label=\textcolor{RoadBlue}{\small$\blacktriangleright$}
+}
+
+\setlist[enumerate]{
+    leftmargin=1.7em,
+    itemsep=0.25em,
+    topsep=0.25em,
+    label=\textcolor{RoadBlue}{\bfseries\arabic*.}
+}
+
+% -
+% Box styles
+% -
+\tcbset{
+    roadbase/.style={
+        enhanced,
+        breakable,
+        arc=2mm,
+        boxrule=0.6pt,
+        left=4mm,
+        right=4mm,
+        top=3mm,
+        bottom=3mm,
+        colback=RoadSoft,
+        colframe=RoadLine,
+        coltitle=white,
+        fonttitle=\bfseries,
+        attach boxed title to top left={xshift=4mm,yshift=-2mm},
+        boxed title style={arc=2mm,boxrule=0pt,left=3mm,right=3mm,top=1mm,bottom=1mm}
+    }
+}
+
+\newtcolorbox{figurecard}[1][]{
+    enhanced,
+    arc=2mm,
+    boxrule=0.6pt,
+    colback=white,
+    colframe=RoadLine,
+    left=2mm,
+    right=2mm,
+    top=2mm,
+    bottom=2mm,
+    drop shadow={black!8!white},
+    #1
+}
+
+% Figure macro for ordinary images
+\newcommand{\roadfigure}[4][0.88]{%
+\begin{figure}[htbp]
+    \centering
+    \begin{figurecard}[width=#1\textwidth]
+        \centering
+        \includegraphics[width=\linewidth]{#2}
+    \end{figurecard}
+    \caption{#3}
+    \label{#4}
+\end{figure}
+}
+
+% Safe diagram macro for Images/diagrams.
+% Usage: \diagramfigure[width fraction]{relative/path/no_extension}{caption}{label}
+\newcommand{\diagramfigure}[4][0.95]{%
+\begin{figure}[H]
+    \centering
+    \begin{figurecard}[width=#1\linewidth]
+        \centering
+        \IfFileExists{Images/diagrams/#2.pdf}{%
+            \includegraphics[width=\linewidth]{Images/diagrams/#2.pdf}%
+        }{%
+            \IfFileExists{Images/diagrams/#2.png}{%
+                \includegraphics[width=\linewidth]{Images/diagrams/#2.png}%
+            }{%
+                \fbox{\parbox[c][3.2cm][c]{0.92\linewidth}{\centering\ttfamily Images/diagrams/\detokenize{#2}\\[0.3em]\small Render the PlantUML source to PDF or PNG}}%
+            }%
+        }%
+    \end{figurecard}
+    \caption{#3}
+    \label{#4}
+\end{figure}%
+}
+
+% Back-compatible macro used in the original DD.
+\newcommand{\diagram}[3]{%
+    \diagramfigure[#2]{#1}{#3}{fig:#1}%
+}
+
+% -
+% Tables
+% -
+\renewcommand{\arraystretch}{1.22}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% -
+% Code listings
+% -
+\lstdefinestyle{roadcode}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{RoadBlue},
+    commentstyle=\itshape\color{RoadGrey},
+    stringstyle=\color{RoadPurple},
+    numbers=left,
+    numberstyle=\tiny\color{RoadGrey},
+    frame=single,
+    rulecolor=\color{RoadLine},
+    backgroundcolor=\color{RoadSoft},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false
+}
+\lstset{style=roadcode}
+
+% Inline code helper
+\newcommand{\code}[1]{\texttt{#1}}
+
+% -
+% Metadata commands
+% -
+\newcommand{\LogoFile}{Images/title_icon.png}
+\newcommand{\DocumentType}{DD}
+\newcommand{\DocumentTitle}{Design Document}
+\newcommand{\DocumentAuthors}{%
+\begin{tabular}[t]{@{}l@{}}
+Margherita Bertipaglia \\
+David Cazzaniga \\
+Pasquale Ludovico Ignarra
+\end{tabular}%
+}
+\newcommand{\UniversityName}{Politecnico di Milano}
+\newcommand{\CourseName}{Software Engineering for Automation}
+\newcommand{\AcademicYear}{2025-2026}
+\newcommand{\DocumentVersion}{1.12}
+\newcommand{\ReleaseDate}{\today}
+
+% -
+% Cover page
+% -
+\newcommand{\roadtitlepage}{%
+\hypersetup{pageanchor=false}%
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture,overlay]
+        % top dark band
+        \fill[RoadNavy] (current page.north west) rectangle ([yshift=-5.8cm]current page.north east);
+
+        % accent line
+        \shade[left color=RoadPurple,right color=RoadBlue]
+            ([yshift=-5.8cm]current page.north west) rectangle ([yshift=-5.95cm]current page.north east);
+
+        % white background below
+        \fill[white] ([yshift=-5.95cm]current page.north west) rectangle (current page.south east);
+
+        % centered app logo inside the dark band
+        \node at ([yshift=-2.9cm]current page.north) {%
+        {\includegraphics[width=0.60\textwidth]{images/title_icon.png}}
+        };
+    \end{tikzpicture}
+
+    \vspace*{6.9cm}
+
+    % - document title area -
+    \begin{center}
+        {\fontsize{28}{32}\selectfont\bfseries\color{RoadNavy}\DocumentType\par}
+        \vspace{0.35cm}
+        {\Large\bfseries\color{RoadDeepBlue}\DocumentTitle\par}
+        \vspace{0.35cm}
+    
+    \end{center}
+
+    \vspace{1.8cm}
+
+    % - information block -
+    \begin{center}
+    \begin{tabular}{@{}p{4.2cm}p{8.4cm}@{}}
+        \textcolor{RoadBlue}{\bfseries Authors} & \DocumentAuthors \\[0.45cm]
+        \textcolor{RoadBlue}{\bfseries University} & \UniversityName \\[0.25cm]
+        \textcolor{RoadBlue}{\bfseries Course} & \CourseName \\[0.25cm]
+        \textcolor{RoadBlue}{\bfseries Academic year} & \AcademicYear \\[0.25cm]
+        \textcolor{RoadBlue}{\bfseries Document version} & \DocumentVersion \\[0.25cm]
+        \textcolor{RoadBlue}{\bfseries Release date} & \ReleaseDate \\[0.25cm]
+    \end{tabular}
+    \end{center}
+
+    \vfill
+
+\end{titlepage}
+\hypersetup{pageanchor=true}%
+}
+
+% =========================================================
+% Document
+% =========================================================
+
+
+% Compatibility for the complete Markdown-to-LaTeX content.
+\usepackage{calc}
+\usepackage{etoolbox}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcommand{\ddimage}[1]{%
+  \IfFileExists{#1.pdf}{\includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{#1.pdf}}{%
+    \IfFileExists{#1.png}{\includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{#1.png}}{%
+      \fbox{\parbox{0.92\linewidth}{\centering\small Diagram to render:\\ \texttt{\detokenize{#1}.puml}}}%
+    }%
+  }%
+}
+\newcommand{\ddfigure}[3]{\begin{figure}[H]\centering\ddimage{#1}\caption{#2}\label{#3}\end{figure}}
+\newcommand{\ddfigurestar}[2]{\begin{figure}[H]\centering\ddimage{#1}\caption*{#2}\end{figure}}
+\AtBeginEnvironment{longtable}{\small}
+
+\begin{document}
+
+\roadtitlepage
+
+\tableofcontents
+\clearpage
+
+
+\hypertarget{introduction}{%
+\chapter{Introduction}\label{introduction}}
+
+\hypertarget{purpose}{%
+\section{Purpose}\label{purpose}}
+
+This is the Design Document (DD) of ROAd (Robotaxi Optimized
+Allocation). The document describes how the system is built: the
+software architecture, the components and their interfaces, the way they
+interact at runtime, the design patterns we adopt, the user interface,
+the mapping from requirements to design, and the plan to implement,
+integrate and test the system.
+
+\hypertarget{main-goals}{%
+\subsection*{Main Goals}\label{main-goals}}
+\addcontentsline{toc}{subsection}{Main Goals}
+
+ROAd supports the management of an autonomous taxi fleet in a city.
+Passengers can request immediate rides or book rides in advance from a
+mobile app; the system assigns a suitable robotaxi according to a
+vehicle-allocation strategy that the fleet operator can choose at
+runtime. The system tracks the lifecycle of each robotaxi, notifies
+passengers about relevant events, lets the operator monitor the fleet
+from a web dashboard, and proactively rebalances available robotaxis
+toward areas of expected high demand. Autonomous driving and onboard vehicle control are outside the scope of
+ROAd. Geocoding, mapping, and route computation rely on external services
+and are not implemented by the core system. Payment processing is also
+outside the project scope and is not integrated into the prototype.
+\hypertarget{definitions-acronyms-abbreviations}{%
+\section{Definitions, Acronyms,
+Abbreviations}\label{definitions-acronyms-abbreviations}}
+
+\hypertarget{definitions}{%
+\subsection*{Definitions}\label{definitions}}
+\addcontentsline{toc}{subsection}{Definitions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Component}: A modular, replaceable unit of the system that
+  provides and requires services through well-defined interfaces.
+\item
+  \textbf{Tier}: A physical (deployment) layer of the architecture. ROAd
+  is organised in three tiers: presentation, application, data.
+\item
+  \textbf{S2B - Software To Be}: The ROAd backend together with the
+  two clients.
+\item
+  \textbf{Manager}: An internal backend component responsible for one
+  coherent area of the application logic.
+\item
+  \textbf{Gateway}: A component that mediates access to an external
+  system, hiding its specific protocol from the rest of the system.
+\item
+  \textbf{Context}: In the State/Strategy patterns, the object that
+  delegates part of its behaviour to a separate state/strategy object.
+\end{itemize}
+
+\hypertarget{acronyms}{%
+\subsection*{Acronyms}\label{acronyms}}
+\addcontentsline{toc}{subsection}{Acronyms}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DD} (Design Document)
+\item
+  \textbf{RASD} (Requirements Analysis and Specification Document)
+\item
+  \textbf{API} (Application Programming Interface)
+\item
+  \textbf{REST} (Representational State Transfer)
+\item
+  \textbf{MVC} (Model-View-Controller)
+\item
+  \textbf{ETA} (Estimated Time of Arrival)
+\item
+  \textbf{FSM} (Finite State Machine)
+\item
+  \textbf{UML} (Unified Modeling Language)
+\end{itemize}
+
+\hypertarget{abbreviations}{%
+\subsection*{Abbreviations}\label{abbreviations}}
+\addcontentsline{toc}{subsection}{Abbreviations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{{[}Rn{]}} n-th functional requirement
+\item
+  \textbf{{[}NFRn{]}} n-th non-functional requirement
+\item
+  \textbf{{[}Cn{]}} n-th constraint 
+\item
+  \textbf{{[}Mn{]}} n-th milestone
+\item \textbf{[vX.Y]} marker of a feature or design
+update introduced in version X.Y.
+\end{itemize}
+
+\hypertarget{revision-history}{%
+\section{Revision history}\label{revision-history}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.09}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.16}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.75}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Version
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Date
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1.0 & July 11, 2026 &
+Initial release of the Design Document. \\[0.6em]
+
+1.1 & August 10, 2026 &
+Refined component interfaces, notification handling, reservation rules,
+booking activation, and demand estimation to provide a precise and
+testable basis for implementation. Added ride cancellation to
+requirements traceability. \\[0.6em]
+
+1.2 & August 11, 2026 &
+Aligned ride-request flows and component dependencies with the
+implementation. Corrected reservation and assignment ordering,
+booking eligibility, and cancellation transitions to prevent
+conflicting assignments and release cancelled rides correctly. \\[0.6em]
+
+1.3 & August 12, 2026 &
+Completed ride persistence, lifecycle operations, and notification
+delivery. Defined client subscription management and token verification
+for WebSocket connections, ensuring that state changes are persisted
+before they are announced. \\[0.6em]
+
+1.4 & August 12, 2026 &
+Refined automatic strategy switching and fleet rebalancing.
+Protected manual selections from concurrent automatic updates,
+limited repeated traffic alerts, and defined deterministic
+repositioning rules and external-provider interfaces. \\[0.6em]
+
+1.5 & August 12, 2026 &
+Integrated external routing services and the fleet simulator,
+including telemetry and numerical ETA notifications.
+Extended cancellation to vehicles approaching or waiting at pickup,
+with route revocation before releasing the assignment. \\[0.6em]
+
+1.6 & August 13, 2026 &
+Added fleet overview access, browser-side passenger session
+persistence, assigned-vehicle tracking, and operator profile
+management to support the main interactions of both clients. \\[0.6em]
+
+1.7 & August 13, 2026 &
+Improved continuous vehicle tracking and synchronised position
+updates. Introduced an explicit simulated boarding interval,
+specified single-instance execution of periodic tasks, and
+recalibrated demo data to make rebalancing observable. \\[0.6em]
+
+1.8 & August 22, 2026 &
+Separated rebalancing completion checks from the demand-planning
+cycle. Vehicles reaching their target now become available and
+update their recorded zone without waiting for the next
+planning cycle. \\[0.6em]
+
+1.9 & August 27, 2026 &
+Documented the passenger client's direct dependencies on geocoding
+and road-snapping services, including the absence of fallback
+behaviour and its impact on ride requests. \\[0.6em]
+
+1.10 & August 28, 2026 &
+Exposed the last observed traffic level and displayed it alongside
+the active strategy. Added periodic refresh so that the dashboard
+remains updated even when no notification is emitted. \\[0.6em]
+
+1.11 & August 28, 2026 &
+Made scheduling intervals and booking activation lead time
+configurable, and added a scripted traffic source to support
+repeatable demonstrations while preserving the existing defaults. \\[0.6em]
+
+1.12 & August 29, 2026 &
+Added persistent storage and retrieval of operator alerts so that
+recent notifications remain available after a dashboard reload. \\
+
+\end{longtable}
+
+\hypertarget{document-structure}{%
+\section{Document Structure}\label{document-structure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Chapter 1 - Introduction}: Purpose, terminology, revision
+  history, structure.
+\item
+  \textbf{Chapter 2 - Architectural Design}: The architectural style,
+  the component view, the class view of the most relevant components,
+  the runtime view, the deployment view, and the selected styles and
+  design patterns.
+\item
+  \textbf{Chapter 3 - User Interface Design}: An overview of the
+  passenger app and of the operator dashboard through wireframes.
+\item
+  \textbf{Chapter 4 - Requirements Traceability}: How the requirements
+  of the RASD are satisfied by the components and patterns of this
+  document.
+\item
+  \textbf{Chapter 5 - Implementation, Integration and Test Plan}: The
+  order in which we plan to implement, integrate and test the
+  subcomponents.
+\item
+  \textbf{Chapter 6 - References}
+\end{itemize}
+
+\hypertarget{architectural-design}{%
+\chapter{Architectural Design}\label{architectural-design}}
+
+\hypertarget{overview-and-architectural-style}{%
+\section{Overview and architectural
+style}\label{overview-and-architectural-style}}
+
+ROAd adopts a \textbf{three-tier client-server architecture}:
+
+\begin{itemize}
+\tightlist
+\item
+  A \textbf{presentation tier} with two thin clients:
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    The Passenger mobile-friendly web application
+  \item
+    The Operator Web Dashboard
+  \end{enumerate}
+\item
+  An \textbf{application tier} for the ROAd backend (the S2B core),
+  which contains all the management logic, organised as a set of
+  cooperating components behind an API Gateway.
+\item
+  A \textbf{data tier} for a single relational database that stores
+  accounts, requests, rides, vehicles and reservations.
+\end{itemize}
+
+\hypertarget{component-view}{%
+\section{Component view}\label{component-view}}
+
+The component architecture is presented through complementary views,
+each highlighting a specific group of dependencies. Components appearing
+in multiple figures refer to the same architectural elements.
+Each view shows only the connections relevant to its scope; together,
+the figures describe the component relationships of the system.\\
+The main components and the operations they export are:
+
+\begin{itemize}
+
+\item
+  \textbf{API Gateway}: Single entry point for the clients.
+  Exposes REST endpoints and a WebSocket notification channel,
+  routes requests to the appropriate components, and enforces
+  authentication and role-based access.
+
+\item
+  \textbf{AuthenticationManager}: Exposes \code{authenticate()},
+  \code{register()}, and \code{updateProfile()}.
+  Manages user accounts and issues signed access tokens (R1, R2).
+  \textbf{[v1.1]} Public registration creates Passenger accounts;
+  Operator accounts are provisioned separately.
+
+\item
+  \textbf{RideRequestManager}: Exposes \code{submitImmediate()},
+  \code{submitAdvance()}, and \code{cancel()}.
+  Validates requests and coordinates allocation, reservations,
+  and cancellation through the fleet, allocation, persistence,
+  and external-service interfaces (R3, R4, R14).
+  \textbf{[v1.2]} A second port exposes
+  \code{AdvanceBookingActivator.runOnce()} to activate bookings whose activation time has been reached.
+  \textbf{[v1.3]} The \code{IRideLifecycleService} port exposes
+  \code{startPickupNavigation()}, \code{pickupReached()},
+  \code{startRide()}, and \code{completeRide()}.
+  The component manages Ride persistence and status changes,
+  coordinating vehicle transitions and notifications.
+  \textbf{[v1.5]} The \code{IFleetTelemetryService} port reads
+  vehicle telemetry, forwards observed positions to
+  \code{FleetMonitor}, and advances the ride lifecycle.
+
+\item
+  \textbf{AllocationManager}: Exposes
+  \code{allocate(request, candidates)} and
+  \code{setActiveStrategy()}.
+  Acts as the Strategy context, selecting an eligible robotaxi
+  through the active allocation policy (R5, R8).
+  \textbf{[v1.1]} Provides \code{getActiveStrategy()} and accepts
+  the strategy name and change source when updating the policy.
+  A manual selection atomically updates both the strategy and
+  the control mode.
+
+\item
+  \textbf{ModeController}: Exposes \code{onTrafficLevel()},
+  \code{setManual()}, and \code{enableAuto()}.
+  Coordinates Auto/Manual mode and traffic-driven strategy
+  switching, preserving manual overrides (R12, R13, NFR9, NFR10).
+  \textbf{[v1.1]} Provides \code{getMode()} and immediately
+  re-evaluates the last known traffic level when Auto Mode is enabled.
+  \textbf{[v1.4]} A second port exposes
+  \code{TrafficMonitor.runOnce()} to acquire traffic readings.
+  \textbf{[v1.10]} \code{getMode()} also returns the last observed
+  traffic level.
+
+\item
+  \textbf{FleetMonitor}: Exposes \code{getCandidates()},
+  \code{getAvailableRobotaxis()}, \code{getFleetStatus()},
+  \code{assign()}, and \code{requestRebalancing()}.
+  Maintains vehicle position and state information and coordinates
+  lifecycle transitions through the State pattern (R7, G6, G8).
+  \textbf{[v1.2]} Adds \code{getBookableRobotaxis()} for future
+  reservations and \code{releaseAssignment()} for cancellation.
+  \textbf{[v1.3]} Exposes \code{startPickupNavigation()},
+  \code{pickupReached()}, \code{startRide()}, and
+  \code{completeRide()}.
+  \textbf{[v1.5]} Adds \code{recordPositions()} and
+  \code{completeRebalancing()}.
+  \textbf{[v1.8]} Rebalancing completion updates the target
+  \code{zoneId} together with the transition to \code{AVAILABLE}.
+
+\item
+  \textbf{RebalancingManager}: Exposes \code{analyzeDemand()}
+  and \code{rebalance()}.
+  Estimates zone demand and automatically repositions idle
+  robotaxis from surplus zones toward zones with unmet demand
+  (R10, R11, G9).
+  \textbf{[v1.4]} Reads historical demand and active events through
+  \code{IPersistenceService} and records repositioning actions
+  in \code{rebalancing\_action}.
+  \textbf{[v1.5]} Sends route commands through
+  \code{ExternalServicesGateway}.
+  \textbf{[v1.8]} Exposes \code{completeArrivedRebalancing()}
+  to check arrivals independently of the planning cycle and
+  request completion from \code{FleetMonitor}.
+
+\item
+  \textbf{MaintenanceManager}: Exposes
+  \code{requestMaintenance()} and \code{completeMaintenance()}.
+  Manages maintenance records and the corresponding vehicle
+  transitions through the State pattern, excluding vehicles
+  under maintenance from allocation (R9).
+  \textbf{[v1.3]} Publishes notifications after maintenance
+  state changes have been persisted.
+
+\item
+  \textbf{NotificationManager}: Exposes \code{update(event)}.
+  Acts as the concrete Observer and dispatches domain events
+  to the relevant Passenger and Operator sessions (R6, G7).
+  \textbf{[v1.3]} A second port exposes
+  \code{registerSession(session)}, \code{removeSession(session)},
+  and \code{registeredSessions()} to manage active connections.
+  \textbf{[v1.12]} Persists operator alerts and exposes
+  \code{recentAlerts(limit)} through a third port, allowing
+  the dashboard to retrieve recent alerts after a reload.
+
+\item
+  \textbf{PersistenceManager}: Exposes \code{create()},
+  \code{update()}, \code{filterAvailable()}, and \code{reserve()}.
+  Provides database access, availability filtering, and atomic
+  reservation operations, including joint creation of an advance
+  booking and its reservation. Database constraints prevent
+  overlapping vehicle reservations (NFR4, C1).
+  \textbf{[v1.1]} Exposes \code{find()} for querying persisted data.
+
+\item
+  \textbf{ExternalServicesGateway}: Exposes \code{getETA()}
+  and mediates communication with external providers (NFR8).
+  \textbf{[v1.4]} Uses a facade with provider-specific adapters
+  and exposes \code{getTraffic()}.
+  \textbf{[v1.5]} Adds \code{commandRoute()} and
+  \code{readTelemetry()} for fleet interaction.
+  A separate \code{FleetSimulationPort} advances the simulated
+  vehicles used by the prototype.
+  \textbf{[v1.11]} Supports configurable hourly and scripted
+  traffic adapters, with the hourly source as the default.
+
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.3\textwidth]
+        {diagrams/component_diagrams/main_components}%
+    }
+    \caption{High-level component diagram of the ROAd system}
+    \label{fig:components}
+\end{figure}
+\hypertarget{class-view}{%
+\section{Class view}\label{class-view}}
+
+This section zooms into the three components that carry selected design patterns. The remaining components are mostly procedural
+and do not need a class-level view.
+The class diagrams in this section show only the classes, attributes,
+operations, and relationships relevant to the specific scenario or
+design aspect being described. They are therefore partial views of the
+overall implementation rather than complete representations of all
+system classes.
+\hypertarget{allocationmanager-strategy}{%
+\subsection{AllocationManager}\label{allocationmanager-strategy}}
+
+Figure~\ref{fig:class_allocation} shows the classes implementing the
+allocation logic.The
+\code{AllocationManager} maintains a registry of
+\code{AllocationStrategy} implementations and delegates vehicle
+selection to the strategy identified by the active strategy name. The
+concrete strategies \code{NearestAvailableStrategy} and
+\code{MinimumETAStrategy} implement the available allocation policies,
+while the \code{ModeController} manages the switch between them.
+\textbf{{[}v1.1{]}} The \code{allocate()} and
+\code{selectRobotaxi()} operations may return no vehicle when no
+eligible candidate is available. The active strategy is selected by
+name, and changes specify whether they originate from automatic or
+manual mode control. Candidate ties are resolved deterministically by
+\code{robotaxiID}, while candidates whose score cannot be computed are
+excluded.
+\textbf{{[}v1.4{]}} The \code{ModeController} governs the automatic and
+manual allocation modes and the current traffic level. These values are
+persisted in the shared \code{system\_mode} record rather than kept as
+local object state, ensuring consistency across replicated backend
+instances.\\
+The allocation strategies expose a common interface. Strategies that
+require external information, such as
+\code{MinimumETAStrategy}, obtain it through the
+\code{ExternalServicesGateway}; this interaction is asynchronous, while
+the common strategy interface remains unchanged.
+
+\ddfigure{diagrams/class_diagrams/allocation_manager}{Class diagram of the AllocationManager. The Strategy pattern applied to
+vehicle allocation.}{fig:class_allocation}
+
+\hypertarget{robotaxi-state}{%
+\subsection{Robotaxi}\label{robotaxi-state}}
+
+Figure~\ref{fig:class_state} shows the lifecycle classes. The \code{Robotaxi} keeps a
+reference to the \code{RobotaxiState} interface. The concrete states
+are \code{AvailableState}, \code{AssignedState},
+\code{ArrivingState}, \code{ArrivedState}, \code{InRideState},
+\code{RebalancingState} and \code{MaintenanceState}. Each concrete
+state defines the behaviour of the transitions that are legal from it,
+while calls for any other transition are rejected. This makes illegal
+transitions impossible by construction (NFR5).
+
+\ddfigure{diagrams/class_diagrams/robotaxi_state}{Class diagram of the Robotaxi. The State pattern applied to the vehicle
+lifecycle.}{fig:class_state}
+
+\hypertarget{notificationmanager-observer}{%
+\subsection{NotificationManager}\label{notificationmanager-observer}}
+
+Figure~\ref{fig:class_notification} shows the notification classes. \code{Robotaxi} and
+\code{Ride} are subjects, while the \code{NotificationManager} is
+the observer that is notified whenever a subject changes state. It then
+dispatches the received events to the \code{PassengerAppSession} and
+the \code{OperatorDashboardSession}.
+
+\ddfigure{diagrams/class_diagrams/class_notification}{Class diagram of the notification mechanism. The Observer pattern used
+to propagate domain events from subjects to observers.}{fig:class_notification}
+\noindent
+\textbf{Realisation of the two subscription levels {[}v1.1{]}.}
+The diagram represents two distinct one-to-many relations with different
+lifetimes.
+\begin{itemize}
+    \item The relation between \code{Subject} and \code{Observer} is static during
+the execution of an operation. \code{Robotaxi} and \code{Ride} are
+reconstructed from the persisted data when needed and temporarily hold
+the registered \code{NotificationManager}. After a state or ride-status
+change has been successfully persisted, the subject notifies this
+observer.
+\item The relation between \code{NotificationManager} and the client sessions
+is dynamic. \code{PassengerAppSession} and
+\code{OperatorDashboardSession} are created when a WebSocket connection
+is established and removed when it is closed. Passenger sessions receive
+events related to their own rides, whereas operator sessions receive
+fleet-wide events. Domain objects therefore remain independent of the
+transport layer.
+
+\end{itemize}
+\textbf{Notification timing {[}v1.3{]}.}
+Notifications are emitted only after the corresponding transition has
+been persisted successfully. \code{FleetMonitor} notifies observers of
+robotaxi state changes, while \code{RideRequestManager} notifies them of
+ride-status changes. This prevents clients from receiving notifications
+for transitions rejected by the persistence layer.\\
+\textbf{Ride as a second subject {[}v1.3{]}.}
+In addition to \code{Robotaxi}, \code{Ride} acts as a subject and
+notifies the \code{NotificationManager} whenever its status changes.
+This supports passenger notifications throughout the ride lifecycle.\\
+\textbf{Persistent operator alerts {[}v1.12{]}.}
+Passenger notifications and operator alerts are handled separately.
+Passenger notifications are stored for their intended recipient, while
+fleet-wide governance events are persisted as operator alerts.
+The \code{recentAlerts()} operation allows the operator dashboard to
+retrieve these alerts after a disconnection or page reload.
+
+\hypertarget{runtime-view}{%
+\section{Runtime view}\label{runtime-view}}
+
+The sequence diagrams below refine, at component level, the
+requirement-level scenarios of the RASD. They show the order of messages
+exchanged among components to accomplish the most relevant tasks.
+
+\hypertarget{immediate-ride-request}{%
+\subsubsection{\texorpdfstring{Immediate ride request}{Immediate ride request}}
+\label{immediate-ride-request}}
+\ddfigure{diagrams/sequence_diagrams/immediate_ride_request}{Sequence diagram of the immediate ride request and allocation flow.
+including request persistence, robotaxi selection, assignment, and
+passenger notification (R3, R5, R6).}{fig:seq_immediate_ride}
+
+\hypertarget{automatic-strategy-switching}{%
+\subsubsection{\texorpdfstring{Automatic strategy switching}{Automatic strategy switching}}
+\label{automatic-strategy-switching}}
+\ddfigure{diagrams/sequence_diagrams/seq_auto_strategy_switch}{Sequence diagram of the automatic strategy switching flow, showing
+hysteresis-based strategy selection in Auto Mode and the priority of
+human manual override (R12, R13, NFR9, NFR10).}{fig:seq_auto_strategy_switch}
+\noindent
+\textbf{Traffic hysteresis rule {[}v1.1{]}.}
+In Auto Mode, \code{ModeController} evaluates the last observed traffic
+level according to the following rule:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Observed level & Effect in Auto Mode \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\code{LOW} & switch to \code{NEAREST\_AVAILABLE} if not already active \\
+\code{MEDIUM} & keep the current strategy and alert the operator \\
+\code{HIGH} & switch to \code{MINIMUM\_ETA} if not already active \\
+\end{longtable}
+\noindent
+The \code{MEDIUM} level acts as a dead band: it never causes a strategy
+switch and prevents oscillations between the two allocation policies.
+When \code{enableAuto()} is invoked, the system immediately re-evaluates
+the last observed traffic level using the same rule. If the level is
+\code{MEDIUM}, the currently active strategy is retained.
+\hypertarget{dynamic-fleet-rebalancing}{%
+\subsubsection{\texorpdfstring{Dynamic fleet rebalancing}{Dynamic fleet rebalancing}}
+\label{dynamic-fleet-rebalancing}}
+\ddfigure{diagrams/sequence_diagrams/seq_rebalancing}{Sequence diagram of the dynamic fleet rebalancing flow, including demand
+analysis, available vehicle selection, and route command dispatch (R10,
+R11).}{fig:seq_rebalancing}
+\noindent
+\textbf{Realised rebalancing cycle {[}v1.5{]}.}
+The rebalancing planning cycle reads historical demand samples and active
+events from the persistence layer and selects eligible idle robotaxis for
+repositioning. It does not invoke \code{getDemandData()}: demand
+information is obtained through \code{IPersistenceService}. Traffic data is
+not used by this process, since it only affects the allocation strategy
+managed by the \code{ModeController}.
+For each selected robotaxi, the system requests the
+\code{REBALANCING} transition, records the rebalancing action, and sends a
+route command through \code{ExternalServicesGateway}. The command returns
+route information, such as distance and duration.
+\textbf{{[}v1.8{]}}
+The completion of an ongoing repositioning is handled by a separate
+telemetry cycle, independently of the ten-minute demand-planning cycle.
+\code{RebalancingScheduler.completeArrivedVehicles()} reads fleet
+telemetry and invokes \code{completeArrivedRebalancing()} for vehicles that
+have reached their target zone. The operation asks \code{FleetMonitor} to
+complete the transition to \code{AVAILABLE} and update the vehicle's
+recorded zone.
+\hypertarget{advannce-booking-flow}{%
+\subsubsection{\texorpdfstring{Advance booking flow}{Advance booking flow}}
+\label{dynamic-fleet-rebalancing}}
+\ddfigure{diagrams/sequence_diagrams/seq_advance_booking}{Sequence diagram of the advance booking flow, including request
+validation, future vehicle allocation, conflict prevention, atomic
+booking and robotaxi reservation, and passenger notification (R4, NFR4,
+C1).}{fig:seq_advance_booking}
+\noindent
+\textbf{Booking candidate selection {[}v1.2{]}.}
+Advance bookings use \code{getBookableRobotaxis()}, which considers
+vehicles that may become available before the scheduled pickup time.
+The subsequent \code{filterAvailable()} operation checks the selected
+time window and excludes vehicles with conflicting reservations.
+Robotaxis in \code{MAINTENANCE} are excluded because their return to
+service cannot be predicted.
+
+\hypertarget{the-reservation-timeline-v1.1}{%
+\subsubsection{\texorpdfstring{The reservation timeline
+\textbf{{[}v1.1{]}}}{The reservation timeline {[}v1.1{]}}}\label{the-reservation-timeline-v1.1}}
+
+Immediate rides and advance bookings use the same reservation timeline.
+Every assignment reserves a bounded interval, allowing the persistence
+layer to prevent overlapping commitments for the same robotaxi.
+For an immediate ride, the interval starts when the vehicle is assigned
+and covers the estimated pickup and ride durations. For an advance
+booking, it starts at the activation time before the scheduled pickup
+and extends until the estimated end of the ride. A configurable buffer
+is added to both intervals.
+When a ride is completed or cancelled, the unused portion of its
+reservation is released.
+
+\hypertarget{advance-booking-activation-v1.1}{%
+\subsubsection{\texorpdfstring{Advance booking activation
+\textbf{{[}v1.1{]}}}{Advance booking activation {[}v1.1{]}}}\label{advance-booking-activation-v1.1}}
+
+Advance bookings are activated shortly before their scheduled pickup
+time by a periodically invocation of\code{AdvanceBookingActivator.runOnce()}, owned by the
+\code{RideRequestManager}.
+For each due booking, the system verifies whether the reserved robotaxi
+is still eligible. If so, it is assigned to the ride and the normal
+ride lifecycle begins. Otherwise, the system selects another eligible
+vehicle through \code{AllocationManager.allocate()}. If no suitable
+robotaxi is available, the booking is rejected and the Passenger is
+notified.
+
+\ddfigurestar{diagrams/sequence_diagrams/advance_booking_activation}{Advance booking activation [v1.1].}
+
+\hypertarget{cancellation-v1.1}{%
+\subsubsection{\texorpdfstring{Cancellation
+\textbf{{[}v1.1{]}}}{Cancellation {[}v1.1{]}}}\label{cancellation-v1.1}}
+
+The Passenger can cancel a ride request before the ride begins.
+\code{RideRequestManager.cancel()} first verifies that the request belongs
+to the Passenger and is still cancellable.
+If the request has no assigned robotaxi, as in an advance booking that has
+not yet been activated, no route is revoked and no vehicle assignment is
+released. The active reservation is released through
+\code{PersistenceManager}, while the booking record is closed by setting
+its \code{closedAt} timestamp and clearing its reservation reference.
+If a robotaxi has already been assigned and its current state allows
+cancellation, the system first revokes its route through
+\code{ExternalServicesGateway} and then asks \code{FleetMonitor} to release
+the assignment and return the vehicle to \code{AVAILABLE}. The request is
+then marked as \code{CANCELLED}, its reservation is released, and the
+corresponding \code{Ride} is updated and the Passenger is notified.
+Booking and reservation records are therefore retained for historical
+purposes rather than deleted. A booking is closed and its reservation is
+released, making the corresponding time window available again.
+If the cancellation is not allowed in the current robotaxi state, the
+request, booking, and reservation remain unchanged, and the Passenger
+receives a rejection notification.
+\ddfigurestar{diagrams/sequence_diagrams/cancellation}{Cancellation procedure [v1.1].}
+\hypertarget{deployment-view}{%
+\section{Deployment view}\label{deployment-view}}
+
+FFigure~\ref{fig:deployment} shows the target deployment architecture of
+ROAd. The application server is represented as replicable to indicate
+that the request-processing logic can be replicated while sharing the
+authoritative database. The current prototype, however, runs as a single
+backend instance.
+The prototype uses a locally simulated robotaxi fleet, while demand
+information is read from persisted database records. The WebSocket
+connections and the fleet simulator maintain process-local runtime state;
+therefore, they are not currently shared between multiple backend
+instances. The \code{PersistenceManager} is the only component that
+accesses the database, whereas communication with external routing,
+traffic, and vehicle services is mediated by the
+\code{ExternalServicesGateway}.
+
+\begin{figure}[htbp]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.3\textwidth]
+        {diagrams/component_diagrams/deployment_view}%
+    }
+    \caption{Deployment view of the three-tier architecture}
+    \label{fig:deployment}
+\end{figure}
+
+\hypertarget{selected-architectural-styles-and-patterns}{%
+\section{Selected architectural styles and
+patterns}\label{selected-architectural-styles-and-patterns}}
+
+The following patterns are used to structure the main parts of the ROAd
+system and to keep the implementation modular and extensible.
+
+\subsection{Strategy - allocation algorithms}
+\textbf{Problem.}
+The system must support different robotaxi allocation policies depending
+on traffic conditions or operator preferences. The selected policy must
+be replaceable without modifying the ride-request logic.\\
+\textbf{Solution.}
+The abstract \code{AllocationStrategy} defines the
+\code{selectRobotaxi()} operation. The concrete
+\code{NearestAvailableStrategy} and \code{MinimumETAStrategy}
+implement the available policies. The \code{AllocationManager} acts as
+the context and maintains the registered strategies, selecting the
+active one through its \code{StrategyName}. The
+\code{ModeController} changes the active strategy when required by the
+traffic level or by the operator, as shown in
+Figure~\ref{fig:class_allocation}.\\
+\textbf{Why.}
+The Strategy pattern makes allocation policies interchangeable and
+independently testable. It also allows additional strategies to be
+introduced without changing the request-handling logic.
+
+\subsection{Observer - state-change notifications}
+
+\textbf{Problem.}
+Passengers and fleet operators must receive updates when a robotaxi
+changes state or a ride changes status. The domain objects should not
+depend directly on client sessions or communication protocols.\\
+\textbf{Solution.}
+\code{Robotaxi} and \code{Ride} act as subjects, while
+\code{NotificationManager} acts as the observer, as shown in Figure~\ref{fig:class_notification}. It receives domain
+events and dispatches them to the connected
+\code{PassengerAppSession} and \code{OperatorDashboardSession} objects.
+Passenger sessions receive events related to their own rides, whereas
+operator sessions receive fleet-wide events.\\
+\textbf{Why.}
+The Observer pattern decouples event producers from notification
+recipients and supports dynamic client connections. Notifications are
+sent after the corresponding state or status change has been persisted.
+
+\subsection{State - robotaxi lifecycle}
+
+\textbf{Problem.}
+A robotaxi can perform different operations depending on its current
+lifecycle state, and only specific transitions are valid from each
+state. Distributing these rules across conditional statements could
+lead to invalid state changes.\\
+\textbf{Solution.}
+The \code{Robotaxi} object delegates lifecycle operations to its current
+\code{RobotaxiState}. The concrete states are
+\code{AvailableState}, \code{AssignedState}, \code{ArrivingState},
+\code{ArrivedState}, \code{InRideState}, \code{RebalancingState}, and
+\code{MaintenanceState}. Invalid operations raise an
+\code{IllegalTransitionError}. The complete lifecycle is shown in
+Figure~\ref{fig:state_robotaxi}.
+
+\ddfigure{diagrams/finite_state_machine/fsm_robotaxi_state}
+{Design-level state machine of the Robotaxi realised through the State
+pattern.}
+{fig:state_robotaxi}
+\noindent
+\textbf{Why.}
+The State pattern is used because the operations permitted on a
+robotaxi depend directly on its current lifecycle state. Encapsulating
+the valid transitions in separate state classes avoids a large
+centralised conditional structure and prevents illegal operations by
+construction, as shown in Figure~\ref{fig:class_state}. It also localises future changes to the affected state,
+while keeping the \code{Robotaxi} context independent of
+state-specific behaviour. This makes the lifecycle explicit, testable,
+and consistent with the persisted state.
+
+\subsection{Other patterns and styles}
+
+\textbf{Problem.}
+The system interacts with external providers and must support different
+client interfaces without exposing provider-specific details to the
+business logic. The frontend must also separate data management,
+presentation, and user interaction responsibilities.\\
+\textbf{Solution.}
+The \code{ExternalServicesGateway} combines the
+\textbf{Facade} and \textbf{Adapter} patterns to provide a uniform
+interface to mapping, traffic, routing, telemetry, and vehicle services.
+Provider-specific protocols are therefore isolated from the backend
+components.\\
+The passenger and operator clients are implemented with React and follow
+the \textbf{MVC} principle by separating observable application state, rendered
+views, and user-interaction logic. This represents a separation of
+responsibilities in the frontend rather than a strict hierarchy of
+MVC classes.\\
+Backend services are created through \textbf{dependency injection}, with
+one instance of each service per backend process where required by the
+implementation. This provides process-local behaviour similar to the
+Singleton pattern, without introducing a separate Singleton implementation.\\
+\textbf{Why.}
+These styles isolate external dependencies, keep the core logic
+independent of provider-specific protocols, and separate frontend
+responsibilities. They also simplify the evolution and testing of both
+the clients and the backend services.
+
+\hypertarget{user-interface-design}{%
+\chapter{User Interface Design}\label{user-interface-design}}
+
+This chapter presents the implemented user interfaces through
+representative screenshots. The figures illustrate the structure of the
+interfaces and their main interaction flows. Both interfaces are designed to support
+intuitive use without requiring specific training (NFR6).
+
+\section{Passenger Application}
+\label{sec:passenger-application}
+
+\textbf{Responsive delivery [v1.1].}
+The Passenger Client is implemented as a responsive progressive mobile-friendly web
+application. After
+registration or login, the Passenger interacts with a map-centred
+interface. The\textbf{ application menu} provides access to the Passenger's
+profile, advance bookings, theme preferences, and logout.
+\vspace{1em}\\
+Pickup and destination can be selected through address search, the
+device position, or direct interaction with the map. Selected points
+are validated against the service area and snapped to a reachable road.
+Once both points have been defined, the Passenger chooses between an
+immediate ride and an advance booking. In the latter case, a future
+pickup date and time must also be specified.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/start_page.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/pickup_destination.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/select_service.png}
+
+    \caption{Passenger interface for selecting pickup and destination and choosing the ride service}
+    \label{fig:passenger-request-interface}
+\end{figure}
+\noindent
+When an advance booking is accepted, the application displays its
+pickup time and route information. The Passenger can subsequently
+consult the list of bookings waiting for  in the \textbf{bookings panel} and cancel a
+booking when necessary. Once an advance booking is activated, it enters
+the same live ride flow used for immediate requests.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/advance_booking.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/booking_confirmed.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/booking_panel.png}
+
+   \caption{Passenger interface for scheduling an advance ride, receiving booking confirmation, and managing scheduled bookings}
+    \label{fig:advance-ride-request}
+\end{figure}
+\noindent
+\textbf{Live ride tracking [v1.6-v1.7].}
+After a vehicle has been assigned, the request panel is replaced on the
+same map by a live \textbf{status panel}. The panel reports the current ride
+phase, the estimated arrival time, the selected locations, and the
+assigned robotaxi. It also allows cancellation until the ride begins.
+Ride-state changes are received through the WebSocket notification
+channel. The assigned robotaxi position is retrieved periodically and
+shown during the \code{ASSIGNED}, \code{ARRIVING}, \code{ARRIVED}, and
+\code{IN\_RIDE} phases. The map displays the road route from the vehicle
+to the pickup point before boarding and toward the destination while
+the ride is in progress.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/taxi2pickup.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/status_panel.png}
+    \hfill
+    \includegraphics[
+        width=0.30\textwidth,
+        height=0.60\textheight,
+        keepaspectratio
+    ]{images/passenger_gui/taxi2destination.png}
+
+    \caption{Passenger interface showing the assigned robotaxi approaching the pickup location, the draggable ride status panel, and the robotaxi travelling toward the destination}
+    \label{fig:passenger-request-interface}
+\end{figure}
+\noindent
+\textbf{Client-side map services [v1.9].}
+Address search and reverse geocoding are provided by MapTiler, while
+road snapping and route visualisation use OSRM. These services are
+contacted directly by the Passenger Client. Their unavailability may
+prevent route-point selection or the display of the road route and is a
+declared limitation of the prototype.
+
+\section{Fleet Operator Dashboard}
+\label{sec:operator-dashboard}
+
+The Fleet Operator Dashboard is a command-and-control interface that
+provides a live overview of the robotaxi fleet. Its main screen combines
+the fleet map, the fleet status bar, allocation-strategy controls,
+maintenance commands, system alerts, and an operational event log.\\
+The map displays the service zones and the position of every robotaxi,
+using different marker colours to represent the vehicle states.
+Robotaxis can be selected directly from the map, from the fleet status
+bar, or from the operational log. Selecting a vehicle focuses the map on
+its position and makes its information and available maintenance
+commands visible.\\
+The \textbf{status bar} reports the total fleet size and the number of vehicles
+in each lifecycle state. Each state can be expanded to inspect the
+corresponding robotaxis and focus a selected vehicle on the map.
+
+% Insert here a full screenshot of the main dashboard.
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[
+            width=1.10\textwidth,
+            height=0.75\textheight,
+            keepaspectratio
+        ]{images/operator_gui/start_page.png}%
+    }
+    \caption{Fleet Operator Dashboard for live fleet monitoring}
+    \label{fig:operator-main-dashboard}
+\end{figure}
+\noindent
+The \textbf{strategy panel} keeps the current control mode and active allocation
+strategy visible at all times (NFR10). The Fleet Operator can manually
+select either allocation strategy, which switches the system to Manual
+Mode, or re-enable Auto Mode. In Auto Mode, the system manages the
+active strategy according to the observed traffic level.\\
+\textbf{Traffic information [v1.10].}
+The strategy panel also displays the last observed traffic level and a
+short explanation of its effect on automatic strategy management.
+Keeping the traffic level next to the current strategy allows the Fleet
+Operator to relate the input of the hysteresis rule to its result. A
+Medium traffic level retains the current strategy and generates an
+informative alert, while Low and High levels may cause automatic
+strategy changes in Auto Mode.\\
+The dashboard receives discrete changes through the WebSocket
+notification channel and periodically refreshes the fleet positions,
+control mode, traffic level, and stored operator alerts. The connection
+indicator makes the availability of the notification channel visible.
+\vspace{1em}
+\\
+The \textbf{alerts panel} presents relevant governance events, including traffic
+thresholds, allocation-strategy changes, control-mode changes, and
+automatically initiated fleet repositioning actions. Recent alerts are
+stored and restored when the dashboard is reopened.\\
+The \textbf{operational log} separately displays the live sequence of fleet and
+system events received during the current dashboard session. When an
+event refers to a robotaxi, the Fleet Operator can select its identifier
+to focus the corresponding vehicle on the map.
+
+% Insert here detailed crops of the strategy/alerts area and operational log.
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=0.47\textwidth,
+        height=0.55\textheight,
+        keepaspectratio
+    ]{images/operator_gui/strategy_control_panel.png}
+    \hfill
+    \includegraphics[
+        width=0.47\textwidth,
+        height=0.55\textheight,
+        keepaspectratio
+    ]{images/operator_gui/alert_log_panels.png}
+    \caption{Strategy control, operator alerts, and live operational events}
+    \label{fig:operator-control-monitoring}
+\end{figure}
+\noindent
+The \textbf{maintenance panel} operates on the robotaxi currently selected on the
+map. An available vehicle can be placed in maintenance by specifying a
+reason, while a vehicle already in maintenance can be returned to
+service. For all other lifecycle states, the panel indicates that the
+maintenance transition is currently unavailable.
+
+% Insert here a screenshot with a robotaxi selected and its maintenance controls visible.
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.5\textheight,
+        keepaspectratio
+    ]{images/operator_gui/maintenance_panel.png}
+    \caption{Robotaxi selection and maintenance panel}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.5\textheight,
+        keepaspectratio
+    ]{images/operator_gui/maintenance_set.png}
+    \caption{Robotaxi set to maintenance}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.5\textheight,
+        keepaspectratio
+    ]{images/operator_gui/maintenance_completed.png}
+    \caption{Robotaxi maintenance completion}
+    \label{fig:operator-maintenance-interface}
+\end{figure}
+\noindent
+\textbf{Account management [v1.6].}
+The \textbf{application menu} provides access to the Fleet Operator's profile,
+theme preferences, and logout. The \textbf{profile panel} allows personal data
+and credentials to be updated while the fleet map and status bar remain
+visible.
+
+\hypertarget{requirements-traceability}{%
+\chapter{Requirements Traceability}
+\label{requirements-traceability}}
+
+This chapter maps the requirements defined in the RASD to the design
+elements that address them. For each requirement, the tables identify
+the responsible components and explain how their collaboration or the
+selected design mechanisms support its fulfilment.
+
+\section{Functional Requirements}
+\label{functional-requirements}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{longtable}{@{}
+    >{\raggedright\arraybackslash}p{0.26\textwidth}
+    >{\raggedright\arraybackslash}p{\dimexpr0.74\textwidth-2\tabcolsep\relax}
+@{}}
+\toprule
+\textbf{Requirement} & \textbf{Design realisation} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Requirement} & \textbf{Design realisation} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{R1 - Registration and Login}
+&
+\code{AuthenticationManager} manages passenger registration and user
+authentication, stores account data through \code{PersistenceManager},
+and issues signed access tokens. The API Gateway applies authentication
+guards to protected requests.
+\\
+
+\textbf{R2 - Profile Management}
+&
+The passenger and operator interfaces allow users to edit their own
+profile. \code{AuthenticationManager.updateProfile()} validates and
+persists the changes through \code{PersistenceManager}.
+\\
+
+\textbf{R3 - Immediate Ride Request}
+&
+\code{RideRequestManager} validates the request, obtains eligible
+vehicles from \code{FleetMonitor}, and delegates selection to
+\code{AllocationManager}. The assignment and its reservation are
+recorded, and the passenger receives the result. Requests that cannot
+be served are rejected.
+\\
+
+\textbf{R4 - Advance Booking}
+&
+\code{FleetMonitor} identifies bookable vehicles, and
+\code{PersistenceManager} filters them against the requested time
+interval. \code{AllocationManager} selects a candidate, while
+\code{PersistenceManager} atomically stores the booking and reservation.
+\code{AdvanceBookingActivator} subsequently revalidates availability
+and activates the booking, attempting reallocation when necessary.
+\\
+
+\textbf{R5 - Automated Vehicle Allocation}
+&
+\code{FleetMonitor} identifies vehicles eligible according to their
+operational state, while reservation checks exclude conflicting
+commitments. \code{AllocationManager} delegates selection to the
+globally active \code{AllocationStrategy}, using distance or estimated
+arrival time and external routing information where needed.
+\\
+
+\textbf{R6 - Ride Status Notifications}
+&
+\code{Robotaxi} and \code{Ride} act as Subjects in the Observer pattern.
+After changes are persisted, \code{NotificationManager} delivers
+passenger notifications through the WebSocket channel, covering
+vehicle assignment, estimated arrival time, pickup arrival, and ride
+completion. Arrival estimates use information obtained through
+\code{ExternalServicesGateway}.
+\\
+
+\textbf{R7 - Fleet Monitoring}
+&
+The telemetry service obtains vehicle observations through
+\code{ExternalServicesGateway}, and \code{FleetMonitor} records
+positions and maintains the fleet state. The Operator Dashboard combines
+periodic position updates with pushed state-change events to update
+its map and fleet status bar.
+\\
+
+\textbf{R8 - Runtime Strategy Selection}
+&
+The Operator Dashboard exposes controls for selecting Nearest Available
+Vehicle or Minimum ETA. Through \code{ModeController} and
+\code{AllocationManager}, the selected strategy becomes the globally
+active policy for subsequent allocations without interrupting the
+service.
+\\
+
+\textbf{R9 - Maintenance Management}
+&
+\code{MaintenanceManager} validates maintenance operations through the
+robotaxi State pattern and persists the maintenance record and vehicle
+state. Vehicles in \code{MAINTENANCE} are excluded from allocation and
+booking candidates until maintenance is completed.
+\\
+
+\textbf{R10 - Demand Analysis}
+&
+\code{RebalancingManager} reads historical demand samples and active
+events through \code{PersistenceManager}. It estimates demand for each
+zone and compares it with available vehicle supply to identify
+deficits and surpluses.
+\\
+
+\textbf{R11 - Proactive Fleet Rebalancing}
+&
+\code{RebalancingManager} selects eligible idle vehicles from surplus
+zones and directs them toward zones with unmet demand, preserving
+existing commitments. \code{ExternalServicesGateway} issues movement
+commands, while \code{FleetMonitor} manages lifecycle transitions.
+A separate telemetry-driven cycle completes arrived repositionings.
+Rebalancing operates independently of allocation Auto/Manual mode.
+\\
+
+\textbf{R12 - Auto Mode (Default)}
+&
+The initial configuration uses Auto Mode and Nearest Available Vehicle.
+\code{TrafficMonitor} reads the service-area traffic level through
+\code{ExternalServicesGateway} and invokes \code{ModeController}.
+At Low, the controller selects Nearest Available Vehicle; at High,
+Minimum ETA. At Medium, it retains the active strategy and alerts the
+operator with a suggestion to use Minimum ETA.
+\\
+
+\textbf{R13 - Manual Mode (Override)}
+&
+An operator strategy selection causes \code{AllocationManager} to
+persist the selected strategy and Manual Mode atomically.
+Traffic changes cannot alter that selection until the operator
+explicitly re-enables Auto Mode. \code{ModeController} then immediately
+re-evaluates traffic: Low selects Nearest Available Vehicle, High selects
+Minimum ETA, and Medium retains the current strategy.
+\\
+
+
+\textbf{R14 - Ride Cancellation}
+&
+\code{RideRequestManager} marks the request as cancelled and releases
+its reservation, making the interval available again. For an assigned
+vehicle, pickup navigation is revoked through
+\code{ExternalServicesGateway}, and \code{FleetMonitor} returns the
+vehicle to \code{AVAILABLE}. Cancellation is supported during
+assignment, approach, and waiting at pickup, but is rejected once the
+ride begins. An unactivated booking requires no vehicle-state change.
+\\
+
+\end{longtable}
+\endgroup
+
+\section{Non-Functional Requirements}
+\label{non-functional-requirements}
+
+The following table maps the quality requirements, system-wide
+consistency constraints, and architectural objectives identified as
+NFRs in the RASD to their supporting design mechanisms.
+Verification activities are described in the testing chapter.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{longtable}{@{}
+    >{\raggedright\arraybackslash}p{0.26\textwidth}
+    >{\raggedright\arraybackslash}p{\dimexpr0.74\textwidth-2\tabcolsep\relax}
+@{}}
+\toprule
+\textbf{Requirement} & \textbf{Supporting design mechanisms} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Requirement} & \textbf{Supporting design mechanisms} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{NFR1 - Concurrency Handling}
+&
+Database transactions, conditional vehicle-state updates, and
+reservation constraints coordinate concurrent ride requests and
+vehicle-data updates. These mechanisms preserve non-overlapping
+commitments and valid lifecycle transitions when operations compete
+for the same vehicle.
+\\
+
+\textbf{NFR2 - Automatic Update Delivery}
+&
+The Observer pattern and WebSocket channel deliver relevant persisted
+state changes to connected Passenger and Fleet Operator interfaces.
+The clients update their views automatically, without requiring a
+manual refresh. Vehicle positions are refreshed separately through
+periodic requests.
+\\
+
+\textbf{NFR3 - Scalability}
+&
+The domain logic operates on persisted collections of passengers and
+robotaxis rather than a fixed population. Separating clients, business
+logic, and persistence allows these populations to grow without
+changing domain rules. Backend replication is an architectural
+extension; the prototype uses one instance with local simulator and
+WebSocket-session state.
+\\
+
+\textbf{NFR5 - State Consistency}
+&
+\code{Robotaxi} delegates lifecycle operations to its current
+\code{RobotaxiState}. Inadmissible operations raise
+\code{IllegalTransitionError} without applying the requested transition.
+Conditional persistence checks also reject updates based on a state
+that has changed concurrently.
+\\
+
+\textbf{NFR6 - Interface Clarity}
+&
+The clients use explicit labels and visual indicators to distinguish
+ride states, vehicle states, allocation strategies, and control modes.
+Confirmation messages and error feedback indicate whether user
+actions succeeded or were rejected.
+\\
+
+\textbf{NFR7 - Extensibility of Allocation Logic}
+&
+Allocation policies implement the common \code{AllocationStrategy}
+interface and are registered with \code{AllocationManager}.
+\code{RideRequestManager} delegates allocation through the same service
+interface, so adding a policy does not require changing its core
+request-management logic.
+\\
+
+\textbf{NFR8 - Separation of Concerns}
+&
+Account, ride, and fleet management are assigned to distinct components
+with explicit service interfaces. \code{ExternalServicesGateway} uses
+Facade and Adapter to isolate backend provider integrations, allowing
+them to change without modifying unrelated domain logic.
+\\
+
+\textbf{NFR9 - Stability of Auto-Switching}
+&
+\code{ModeController} retains Minimum ETA when traffic falls from High
+to Medium after an automatic switch. Automatic reversion to Nearest
+Available Vehicle occurs only at Low, implementing the hysteresis
+required by R12.
+\\
+
+\textbf{NFR10 - Consistency of Manual Override}
+&
+The selected strategy and the transition to Manual Mode are persisted
+atomically. Automatic strategy updates are conditional on Auto Mode
+still being active, preventing a concurrent traffic evaluation from
+overwriting a manual selection once Manual Mode has taken effect.
+\\
+
+\end{longtable}
+\endgroup
+\hypertarget{operational-definitions-of-the-quality-requirements-v1.1}{%
+\section{\texorpdfstring{Operational definitions of the quality
+requirements
+\textbf{{[}v1.1{]}}}{Operational definitions of the quality requirements {[}v1.1{]}}}\label{operational-definitions-of-the-quality-requirements-v1.1}}
+
+Section 4.2 maps each quality to the decision that supports it, which is
+the right level for a design document but is not falsifiable: ``the
+architecture is scalable'' cannot fail a test. Since every requirement
+in this project must be demonstrated by at least one test that names it,
+each NFR is restated below as a proposition that can actually be
+refuted. Three of them (NFR3, NFR6, NFR8) had no observable form at all
+in v1.0 and are the reason this section exists; the others are listed so
+that the whole set is verified the same way.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.09}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.55}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.36}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+NFRn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Proposition that must hold
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How it is refuted
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NFR1 & Two concurrent requests for the last available robotaxi produce
+exactly one assignment and one rejection & Both succeed, or both fail \\
+NFR2 & A state change reaches a connected client over the push channel
+without the client polling & The client only learns of the change by
+issuing a new request \\
+NFR3 & No server-side session state exists: a token issued by one
+application instance is accepted by a second instance that never handled
+the login, and authentication consults no in-memory store & The second
+instance rejects the token \\
+NFR4 & No two reservations of the same robotaxi ever overlap, whatever
+the interleaving of writers & An overlapping pair is committed \\
+NFR5 & Every transition absent from Figure 2.10 raises
+\code{IllegalTransitionError}, and the state survives persistence and
+reconstruction & Any illegal transition succeeds, or a reconstructed
+vehicle answers differently from the original \\
+NFR6 & A passenger completes a ride request from a cold start of the
+client in at most four interactions, and the operator sees mode and
+active strategy on the dashboard's first render, without navigating & An
+extra step is needed, or either indicator is not visible initially \\
+NFR7 & A new allocation policy is added by writing one class and
+registering it, with no edit to \code{AllocationManager} or to
+\code{RideRequestManager} & Adding the third strategy in the tests
+requires touching either manager \\
+NFR8 & No component outside \code{ExternalServicesGateway} references
+a provider protocol or SDK, and the domain tests run with only that
+gateway substituted & A provider import appears elsewhere, or a domain
+test needs a second substitute \\
+NFR9 & The sequence Low\ensuremath{\rightarrow}Medium\ensuremath{\rightarrow}High\ensuremath{\rightarrow}Medium\ensuremath{\rightarrow}Low switches strategy exactly
+twice, at High and at the final Low & A switch happens at either
+Medium \\
+NFR10 & After a manual selection, no traffic level whatsoever changes
+the active strategy until \code{enableAuto()} is called; the switch to
+Manual is atomic with the strategy change & An automatic switch is
+observed while in Manual, or an interleaving leaves Manual mode and the
+manual strategy out of step \\
+\end{longtable}
+
+\hypertarget{implementation-integration-and-test-plan}{%
+\chapter{Implementation, Integration and Test
+Plan}\label{implementation-integration-and-test-plan}}
+
+\hypertarget{feature-prioritisation}{%
+\section{Feature Prioritisation}
+\label{feature-prioritisation}}
+
+Features are prioritised according to their contribution to the core
+service and their implementation dependencies. High-priority features
+establish the basic ride-management workflow; medium-priority features
+extend it with allocation control and fleet optimisation. Both groups
+are required for the final project scope, priority only determines the
+development order.
+
+\begin{longtable}{@{}
+    >{\raggedright\arraybackslash}p{0.78\textwidth}
+    >{\raggedright\arraybackslash}p{\dimexpr0.22\textwidth-2\tabcolsep\relax}
+@{}}
+\toprule
+\textbf{Feature} & \textbf{Priority} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Feature} & \textbf{Priority} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+
+Accounts and profile management (R1, R2) & High \\
+Immediate ride requests and allocation (R3, R5) & High \\
+Robotaxi lifecycle and maintenance (R9, NFR5) & High \\
+Conflict-free advance booking and activation (R4, NFR4) & High \\
+Ride cancellation and reservation release (R14) & High \\
+Ride status notifications (R6, NFR2) & High \\
+Fleet monitoring (R7) & High \\
+Runtime strategy selection (R8) & Medium \\
+Auto Mode and hysteresis (R12, NFR9) & Medium \\
+Manual override (R13, NFR10) & Medium \\
+Demand analysis and automatic rebalancing (R10, R11) & Medium \\
+
+\end{longtable}
+
+\section{Implementation and Integration Order}
+\label{implementation-and-integration-order}
+
+Integration proceeds incrementally, starting from shared infrastructure
+and progressing toward complete user workflows, following the \textbf{bottom-up methodology}. Component interfaces
+and test doubles allow individual modules to be developed before all
+their collaborators are available. Concrete dependencies are then
+integrated and checked through the corresponding milestone tests.
+
+\begin{enumerate}
+    \item \textbf{Shared infrastructure and persistence.}
+    Define shared types, API schemas, component ports, and the database
+    schema. Integrate \code{PersistenceManager}, including transactions
+    and reservation constraints.
+
+    \item \textbf{Authentication and API access.}
+    Integrate \code{AuthenticationManager} with persistence and the API
+    Gateway, covering registration, login, profile updates, and
+    role-based access control.
+
+    \item \textbf{Vehicle lifecycle and maintenance.}
+    Implement \code{Robotaxi} and its State classes, then integrate
+    \code{FleetMonitor} and \code{MaintenanceManager} with persistence.
+    Verify admissible transitions and vehicle eligibility.
+
+    \item \textbf{Allocation strategies.}
+    Implement \code{AllocationManager} and its strategies using supplied
+    candidate lists and an external-service test double.
+    Integrate persistent strategy selection.
+    \code{RideRequestManager}, rather than \code{AllocationManager},
+    coordinates candidate retrieval from \code{FleetMonitor}.
+
+    \item \textbf{Ride requests and reservations.}
+    Integrate immediate requests, advance bookings, atomic reservations,
+    cancellation, and booking activation. Verify reallocation when a
+    reserved vehicle is no longer eligible.
+
+    \item \textbf{Ride lifecycle and notifications.}
+    Integrate ride-status persistence, lifecycle operations, and the
+    Observer notification mechanism. Connect
+    \code{NotificationManager} to authenticated WebSocket sessions.
+
+    \item \textbf{Strategy control and rebalancing.}
+    Integrate \code{ModeController}, \code{TrafficMonitor}, and
+    \code{RebalancingManager}. Cover hysteresis, manual override,
+    demand estimation, and automatic repositioning.
+    Demand samples and events are read from the database.
+
+    \item \textbf{External adapters and fleet simulation.}
+    Integrate the routing and traffic adapters and the fleet simulator
+    through \code{ExternalServicesGateway}. Connect telemetry to ride
+    progression and rebalancing completion, and verify routing fallback
+    behaviour.
+
+    \item \textbf{Clients and complete workflows.}
+    Integrate the Passenger Application and Operator Dashboard with
+    the HTTP and WebSocket interfaces. Verify the main user workflows
+    through browser tests and complete RASD scenario tests.
+\end{enumerate}
+
+\section{Testing Strategy}
+\label{testing-strategy}
+
+Verification follows a \textbf{V-model approach}, relating testing
+activities to the specifications and design elements they verify.
+Unit tests check individual behaviours against the detailed design,
+integration tests verify component interactions and interface
+contracts, and system tests assess complete workflows against the
+RASD requirements. Browser tests additionally verify these workflows
+through the user interfaces. Architecture and contract checks
+complement the behavioural tests.
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.5\textheight,
+        keepaspectratio
+    ]{images/v_model_verification_levels.png}
+    \caption{V-model approach}
+\end{figure}
+\begin{description}
+
+    \item[\textbf{Unit testing.}]
+    Unit tests verify individual classes and functions in isolation,
+    substituting their dependencies where necessary. They cover
+    allocation strategies, robotaxi states, ride management, booking
+    activation, telemetry processing, notifications, and access control.
+
+    Allocation tests exercise empty and unsuitable candidate sets,
+    feasible selections, and deterministic tie-breaking. State tests
+    check admissible operations and the rejection of illegal
+    transitions. Additional tests cover geographical calculations,
+    simulated movement, and client-side presentation logic, including
+    ride phases, traffic indicators, and alert classification.
+
+    \item[\textbf{Integration testing.}]
+    Integration tests verify that collaborating components exchange
+    information correctly and preserve system consistency. They cover
+    authentication, persistence, fleet management, allocation, ride
+    management, notifications, mode control, and rebalancing.
+
+    Database-backed tests use isolated PostgreSQL instances to check
+    reservation conflicts, transaction rollback, concurrent updates,
+    and state reconstruction. External-adapter tests exercise the
+    concrete gateway against a controlled HTTP provider implementing
+    the expected OSRM protocol. These tests cover routing responses,
+    caching, malformed responses, provider unavailability, and fallback
+    estimates.
+
+    \item[\textbf{Architecture and contract testing.}]
+    Architecture checks verify module boundaries and the exposure of
+    declared service ports. Contract tests compare the generated
+    OpenAPI specification with the stored API contract, detecting
+    unintended changes to the interfaces used by clients.
+
+    \item[\textbf{Milestone verification.}]
+    A milestone is an incremental development checkpoint with a
+    defined set of capabilities and completion criteria. Its
+    verification combines behavioural, integration, and structural
+    checks to establish that the increment is ready to support
+    subsequent development. Milestones organise progress across
+    testing levels rather than introducing a separate testing level.
+
+    The project uses the following milestones:
+
+    \begin{itemize}
+        \item \textbf{M0 -- Application Skeleton.}
+        Establish the backend and client applications, basic
+        connectivity, and the automated verification infrastructure.
+
+        \item \textbf{M1 -- Persistence and Database Schema.}
+        Verify data storage, availability filtering, and reservation
+        constraints, including competing reservations for the same
+        robotaxi.
+
+        \item \textbf{M1b -- Authentication and Accounts.}
+        Verify registration, login, profile updates, role-based access,
+        and protection of account credentials.
+
+        \item \textbf{M2 -- Fleet Lifecycle and Maintenance.}
+        Verify the robotaxi State pattern, persistence and
+        reconstruction of vehicle state, maintenance operations,
+        and allocation eligibility.
+
+        \item \textbf{M3 -- Allocation Strategies.}
+        Verify vehicle selection under both strategies, runtime policy
+        changes, tie-breaking, and the registration of an additional
+        test strategy.
+
+        \item \textbf{M4 -- Ride Requests and Bookings.}
+        Verify immediate assignments, atomic advance reservations,
+        cancellation and reservation release, and booking activation
+        with reallocation when necessary.
+
+        \item \textbf{M5 -- Ride Notifications.}
+        Verify ride-status progression and authenticated WebSocket
+        delivery, including passenger-specific events, fleet-wide
+        operator events, and subscription cleanup on disconnection.
+
+        \item \textbf{M6 -- Strategy Control and Rebalancing.}
+        Verify traffic hysteresis, manual override, reactivation of
+        Auto Mode, demand estimation from known data, and automatic
+        dispatch of vehicles from surplus zones.
+
+        \item \textbf{M7 -- External Adapters and Fleet Simulation.}
+        Verify routing and telemetry integration, fallback behaviour,
+        simulated vehicle movement, and rebalancing completion.
+        Cancellation checks also cover route revocation while the
+        vehicle is approaching or waiting at pickup.
+
+        \item \textbf{M8 -- User Interfaces.}
+        Verify passenger and operator workflows through the browser,
+        including ride-status updates and manual strategy selection.
+
+        \item \textbf{M9 -- Complete Scenarios and Demonstration.}
+        Verify the four RASD scenarios, concurrent requests for the
+        last eligible vehicle, requirement-to-test traceability, and
+        readiness of the installation and demonstration procedures.
+    \end{itemize}
+
+Milestone checks provide an additional verification stage before system
+testing. Although not a separate testing level in the classical V-model,
+they combine checks from different levels to assess the completeness
+and consistency of each implementation increment.They are retained as regression tests and extended
+    when later increments expand previously introduced behaviour.
+
+    \item[\textbf{System scenarios and browser testing.}]
+    System scenarios exercise the four RASD workflows: immediate
+    rides, advance bookings, automatic/manual strategy management,
+    and fleet rebalancing. They check that the integrated components
+    produce the expected outcomes across complete sequences of
+    operations.
+
+    Browser tests complement these scenarios by exercising the actual
+    interfaces. They cover client connectivity, passenger ride tracking,
+    advance booking and cancellation, profile updates, operator
+    strategy controls, fleet monitoring, and maintenance.
+
+    A passenger browser test also checks that the ride-request
+    workflow can be completed in four interactions under its defined
+    initial conditions. This is an additional usability check,
+    rather than a constraint imposed by NFR6.
+
+    \item[\textbf{Acceptance walkthrough.}]
+    The final demonstration presents representative passenger and
+    operator workflows and relates their observable outcomes to the
+    RASD goals. This walkthrough complements the automated checks
+    with a review of the system from the users' perspective.
+
+\end{description}
+
+\section{Verification of Quality Requirements}
+\label{quality-requirements-verification}
+
+The following criteria translate the current RASD quality requirements
+into verification activities. Existing suites provide supporting
+evidence; architectural objectives additionally require design review.
+Test presence alone does not demonstrate complete requirement coverage.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{longtable}{@{}
+    >{\raggedright\arraybackslash}p{0.27\textwidth}
+    >{\raggedright\arraybackslash}p{\dimexpr0.73\textwidth-2\tabcolsep\relax}
+@{}}
+\toprule
+\textbf{Requirement} & \textbf{Verification criterion and supporting tests} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Requirement} & \textbf{Verification criterion and supporting tests} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{NFR1 - Concurrency Handling}
+&
+Concurrent requests and vehicle updates must preserve valid states and
+non-overlapping commitments. In the controlled case of two requests
+competing for the last eligible vehicle, exactly one request must be
+accepted. Persistence, fleet, and milestone tests check competing
+writes and assignment outcomes.
+\\
+
+\textbf{NFR2 - Automatic Update Delivery}
+&
+Connected passenger and operator interfaces must receive relevant
+state changes without manual refresh. Notification integration tests,
+WebSocket milestone tests, and browser tests check event delivery and
+automatic view updates. Periodic position reads are distinct from
+state-change delivery.
+\\
+
+\textbf{NFR3 - Scalability}
+&
+Architectural review must establish that increasing passenger and
+robotaxi populations does not require changes to domain logic.
+Cross-instance token acceptance and shared strategy-state tests
+support the separation of authoritative data from individual
+instances, but do not constitute load testing or proof of a complete
+multi-instance deployment.
+\\
+
+\textbf{NFR4 - Data Consistency}
+&
+Conflicting reservations for the same robotaxi must not both commit.
+Persistence and ride integration tests check overlap rejection,
+non-overlapping intervals, atomic booking creation, rollback, and
+reuse of released reservations.
+\\
+
+\textbf{NFR5 - State Consistency}
+&
+Inadmissible lifecycle operations must be rejected without applying
+the requested transition. Robotaxi unit tests and fleet integration
+tests check legal and illegal operations, unchanged persisted state
+after rejection, and behaviour after reconstruction.
+\\
+
+\textbf{NFR6 - Interface Clarity}
+&
+Interface checks must verify distinct ride and vehicle states,
+strategy and mode indicators, and explicit success or rejection
+feedback. Client unit tests and browser tests provide evidence for
+state presentation and user workflows; a visual walkthrough completes
+the review of labels and feedback. Interaction counts are not an
+additional acceptance constraint.
+\\
+
+\textbf{NFR7 - Extensibility of Allocation Logic}
+&
+An additional strategy must be usable through the existing allocation
+interface without changing core ride-request management.
+The allocation milestone tests register and execute an additional
+test strategy without modifying the allocation context.
+\\
+
+\textbf{NFR8 - Separation of Concerns}
+&
+Architecture review and module-boundary tests check distinct component
+responsibilities. External-service integration tests exercise adapters
+independently using controlled provider responses, while domain tests
+substitute service ports. These checks support changing backend
+integrations without modifying unrelated domain logic.
+\\
+
+\textbf{NFR9 - Stability of Auto-Switching}
+&
+Starting in Auto Mode with Nearest Available Vehicle, the sequence
+Low-Medium-High-Medium-Low must switch strategy only at High and
+at the final Low. Mode integration and milestone tests also verify
+that Medium retains the current strategy and generates the appropriate
+operator alert.
+\\
+
+\textbf{NFR10 - Consistency of Manual Override}
+&
+Manual strategy selection and the transition to Manual Mode must be
+atomic. Mode integration tests check that a stale automatic evaluation
+cannot overwrite the manual selection, and that subsequent traffic
+observations leave it unchanged until Auto Mode is explicitly restored.
+\\
+
+\end{longtable}
+\endgroup
+
+\hypertarget{references}{%
+\chapter{References}\label{references}}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{ROAd: Robotaxi Optimized Allocation - Requirements Analysis
+  and Specification Document}, v1.0.
+\item
+  M. Camilli, \emph{Software Engineering for Automation - Course
+  Slides}, Politecnico di Milano, A.Y. 2025-2026 (in particular: modular
+  design, OO design, design patterns, V\&V).
+\item
+  E. Gamma, R. Helm, R. Johnson, J. Vlissides, \emph{Design Patterns:
+  Elements of Reusable Object-Oriented Software}, Addison-Wesley, 1994.
+\item
+  M. Jackson and P. Zave, \emph{The World and the Machine}, ICSE, 1995.
+\item
+  Object Management Group, \emph{Unified Modeling Language
+  Specification}, https://www.omg.org/spec/UML/.
+\item
+  PlantUML, https://plantuml.com (diagram sources in
+  \code{./Images/diagrams/}).
+\end{itemize}
+
+
+\end{document}

@@ -1,0 +1,382 @@
+% =========================================================
+% ROAd App - LaTeX Document Template
+% Compile with: pdfLaTeX
+% Put app_icon.png in the same folder of this .tex file.
+% =========================================================
+
+\documentclass[11pt,a4paper,oneside]{report}
+
+% -------------------------
+% Language and typography
+% -------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,italian]{babel}
+\usepackage{microtype}
+
+% Modern sans-serif style, close to the clean tech feeling of the logo.
+\usepackage[scaled=0.96]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{sfmath}
+
+% -------------------------
+% Page layout
+% -------------------------
+\usepackage[a4paper,top=2.4cm,bottom=2.5cm,left=2.4cm,right=2.4cm,headheight=24pt]{geometry}
+\usepackage{setspace}
+\setstretch{1.08}
+\raggedbottom
+
+% -------------------------
+% Graphics, colors, boxes
+% -------------------------
+\usepackage{graphicx}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{tikz}
+\usepackage[most]{tcolorbox}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage[hidelinks]{hyperref}
+\usepackage{listings}
+
+% -------------------------
+% ROAd palette sampled from the logo
+% -------------------------
+\definecolor{RoadNavy}{RGB}{6,19,40}        % main dark color
+\definecolor{RoadDeepBlue}{RGB}{19,35,113}  % secondary dark blue
+\definecolor{RoadBlue}{RGB}{33,54,202}      % electric blue
+\definecolor{RoadPurple}{RGB}{86,61,230}    % purple accent
+\definecolor{RoadGrey}{RGB}{110,116,135}    % neutral grey
+\definecolor{RoadSoft}{RGB}{244,246,255}    % very light blue background
+\definecolor{RoadLine}{RGB}{188,191,214}    % soft border
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=RoadDeepBlue,
+    citecolor=RoadBlue,
+    urlcolor=RoadPurple
+}
+
+% -------------------------
+% Header and footer
+% -------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{RoadGrey}{\nouppercase{\leftmark}}}
+\rhead{\textcolor{RoadGrey}{ROAd}}
+\cfoot{\textcolor{RoadGrey}{\thepage\,/\,\pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{RoadLine}\leaders\hrule height \headrulewidth\hfill}}
+
+\fancypagestyle{plain}{%
+    \fancyhf{}
+    \cfoot{\textcolor{RoadGrey}{\thepage\,/\,\pageref{LastPage}}}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+% -------------------------
+% Chapter and section style
+% -------------------------
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{RoadNavy}}
+  {\filleft\fontsize{58}{58}\selectfont\color{RoadBlue}\thechapter}
+  {-0.7em}
+  {\titlerule[1.2pt]\vspace{1.0em}\Huge}
+  [\vspace{0.4em}{\color{RoadPurple}\titlerule[1.2pt]}]
+
+\titlespacing*{\chapter}{0pt}{-0.5cm}{1.1cm}
+
+\titleformat{\section}
+  {\Large\bfseries\color{RoadNavy}}
+  {\tikz[baseline=(char.base)]{\node[shape=rectangle,rounded corners=2pt,inner sep=4pt,fill=RoadNavy,text=white] (char) {\thesection};}}
+  {0.8em}
+  {}
+
+\titleformat{\subsection}
+  {\large\bfseries\color{RoadDeepBlue}}
+  {\thesubsection}
+  {0.7em}
+  {}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{RoadPurple}}
+  {\thesubsubsection}
+  {0.7em}
+  {}
+
+% -------------------------
+% Captions
+% -------------------------
+\captionsetup{
+    labelfont={bf,color=RoadNavy},
+    textfont={color=RoadGrey},
+    font=small,
+    justification=centering
+}
+
+% -------------------------
+% Lists
+% -------------------------
+\setlist[itemize]{
+    leftmargin=1.4em,
+    itemsep=0.25em,
+    topsep=0.25em,
+    label=\textcolor{RoadBlue}{\small$\blacktriangleright$}
+}
+
+\setlist[enumerate]{
+    leftmargin=1.7em,
+    itemsep=0.25em,
+    topsep=0.25em,
+    label=\textcolor{RoadBlue}{\bfseries\arabic*.}
+}
+
+% -------------------------
+% Box styles
+% -------------------------
+\tcbset{
+    roadbase/.style={
+        enhanced,
+        breakable,
+        arc=2mm,
+        boxrule=0.6pt,
+        left=4mm,
+        right=4mm,
+        top=3mm,
+        bottom=3mm,
+        colback=RoadSoft,
+        colframe=RoadLine,
+        coltitle=white,
+        fonttitle=\bfseries,
+        attach boxed title to top left={xshift=4mm,yshift=-2mm},
+        boxed title style={arc=2mm,boxrule=0pt,left=3mm,right=3mm,top=1mm,bottom=1mm}
+    }
+}
+
+\newtcolorbox{roadbox}[2][]{
+    roadbase,
+    colback=RoadSoft,
+    colframe=RoadLine,
+    boxed title style={arc=2mm,boxrule=0pt,colback=RoadNavy,colframe=RoadNavy,left=3mm,right=3mm,top=1mm,bottom=1mm},
+    borderline west={2.2pt}{0pt}{RoadBlue},
+    title={#2},
+    #1
+}
+
+\newtcolorbox{keybox}[2][]{
+    roadbase,
+    colback=white,
+    colframe=RoadBlue,
+    boxed title style={arc=2mm,boxrule=0pt,colback=RoadBlue,colframe=RoadBlue,left=3mm,right=3mm,top=1mm,bottom=1mm},
+    borderline west={2.2pt}{0pt}{RoadPurple},
+    title={#2},
+    #1
+}
+
+\newtcolorbox{warningbox}[2][]{
+    roadbase,
+    colback=white,
+    colframe=RoadPurple,
+    boxed title style={arc=2mm,boxrule=0pt,colback=RoadPurple,colframe=RoadPurple,left=3mm,right=3mm,top=1mm,bottom=1mm},
+    borderline west={2.2pt}{0pt}{RoadPurple},
+    title={#2},
+    #1
+}
+
+\newtcolorbox{figurecard}[1][]{
+    enhanced,
+    arc=2mm,
+    boxrule=0.6pt,
+    colback=white,
+    colframe=RoadLine,
+    left=2mm,
+    right=2mm,
+    top=2mm,
+    bottom=2mm,
+    drop shadow={black!8!white},
+    #1
+}
+
+% Figure macro: \roadfigure[width]{file}{caption}{label}
+\newcommand{\roadfigure}[4][0.88]{%
+\begin{figure}[htbp]
+    \centering
+    \begin{figurecard}[width=#1\textwidth]
+        \centering
+        \includegraphics[width=\linewidth]{#2}
+    \end{figurecard}
+    \caption{#3}
+    \label{#4}
+\end{figure}
+}
+
+% -------------------------
+% Tables
+% -------------------------
+\renewcommand{\arraystretch}{1.22}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\newenvironment{roadtable}[1]{%
+    \begin{table}[htbp]
+    \centering
+    \caption{#1}
+    \vspace{0.3em}
+    \rowcolors{2}{RoadSoft}{white}
+}{%
+    \end{table}
+}
+
+% -------------------------
+% Code listings
+% -------------------------
+\lstdefinestyle{roadcode}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{RoadBlue},
+    commentstyle=\itshape\color{RoadGrey},
+    stringstyle=\color{RoadPurple},
+    numbers=left,
+    numberstyle=\tiny\color{RoadGrey},
+    frame=single,
+    rulecolor=\color{RoadLine},
+    backgroundcolor=\color{RoadSoft},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false
+}
+\lstset{style=roadcode}
+
+% -------------------------
+% Metadata commands
+% -------------------------
+\newcommand{\LogoFile}{app_icon.png}
+\newcommand{\DocumentTitle}{Document Title}
+\newcommand{\DocumentSubtitle}{Subtitle or short description}
+\newcommand{\DocumentAuthor}{Author Name}
+\newcommand{\DocumentDate}{\today}
+
+% -------------------------
+% Cover page
+% -------------------------
+\newcommand{\roadtitlepage}{%
+\hypersetup{pageanchor=false}%
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[RoadNavy] (current page.north west) rectangle ([yshift=-5.2cm]current page.north east);
+        \shade[left color=RoadPurple,right color=RoadBlue]
+            ([yshift=-5.2cm]current page.north west) rectangle ([yshift=-5.45cm]current page.north east);
+        \fill[RoadSoft] ([yshift=-5.45cm]current page.north west) rectangle (current page.south east);
+    \end{tikzpicture}
+
+    \vspace*{0.4cm}
+    \begin{center}
+        \IfFileExists{\LogoFile}{%
+            \includegraphics[width=0.38\textwidth]{\LogoFile}
+        }{%
+            {\Huge\bfseries\textcolor{white}{ROAd}}
+        }
+
+        \vspace{2.2cm}
+        {\Huge\bfseries\color{RoadNavy}\DocumentTitle\par}
+        \vspace{0.35cm}
+        {\Large\color{RoadGrey}\DocumentSubtitle\par}
+
+        \vspace{1.0cm}
+        \begin{keybox}[width=0.72\textwidth]{Document info}
+            \textbf{Author:} \DocumentAuthor\\
+            \textbf{Date:} \DocumentDate\\
+            \textbf{Style:} ROAd visual identity
+        \end{keybox}
+
+        \vfill
+    \end{center}
+\end{titlepage}
+\hypersetup{pageanchor=true}%
+}
+
+% =========================================================
+% Document
+% =========================================================
+\begin{document}
+
+\renewcommand{\DocumentTitle}{ROAd Report Template}
+\renewcommand{\DocumentSubtitle}{A LaTeX layout aligned with the app icon}
+\renewcommand{\DocumentAuthor}{Name Surname}
+\renewcommand{\DocumentDate}{\today}
+
+\roadtitlepage
+
+\tableofcontents
+\clearpage
+
+\chapter{Introduction}
+
+This template uses a dark navy base, electric blue and purple accents, and a clean sans-serif typeface to match the ROAd logo. It is intended for reports, design documents, technical documentation and project deliveries.
+
+\begin{roadbox}{Design direction}
+The visual style is based on three ideas: high contrast, clean geometry and dynamic blue-purple accents. The body text remains simple, while sections, boxes and figure frames carry the identity of the app.
+\end{roadbox}
+
+\section{Section style}
+Use sections for the main blocks of the document. The numbered label is dark and compact, while the title remains clean and readable.
+
+\subsection{Subsection style}
+Subsections use the secondary deep blue. Sub-subsections use the purple accent.
+
+\begin{keybox}{Key point}
+Use this box for important definitions, architectural choices, requirements or results.
+\end{keybox}
+
+\begin{warningbox}{Attention}
+Use this box for limitations, assumptions, risks or implementation notes.
+\end{warningbox}
+
+\chapter{Figures and Tables}
+
+\section{Figure frame}
+The command below places figures inside a light rounded frame. The default width is 88\% of the text width.
+
+% Example usage:
+% \roadfigure[0.75]{Figures/example.png}{Example caption.}{fig:example}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{figurecard}[width=0.72\textwidth]
+        \centering
+        {\includegraphics[width=0.85\linewidth]{images/app_icon.png}}
+    \end{figurecard}
+    \caption{Example of a framed figure using the ROAd style.}
+    \label{fig:road-logo-example}
+\end{figure}
+
+\section{Table style}
+
+\begin{roadtable}{Example table with soft alternating rows.}
+\begin{tabularx}{0.88\textwidth}{lYY}
+\toprule
+\textbf{Element} & \textbf{Style choice} & \textbf{Reason} \\
+\midrule
+Font & Sans-serif & Modern, clean, app-like style \\
+Main color & Navy & Strong contrast and professional look \\
+Accent & Blue/Purple & Matches the logo gradient and motion lines \\
+Figures & Framed cards & Keeps screenshots and plots visually consistent \\
+\bottomrule
+\end{tabularx}
+\end{roadtable}
+
+\chapter{Code Example}
+
+\begin{lstlisting}[language=Python,caption={Example code listing.}]
+def compute_speed(distance, time):
+    if time <= 0:
+        raise ValueError("time must be positive")
+    return distance / time
+\end{lstlisting}
+
+\end{document}
