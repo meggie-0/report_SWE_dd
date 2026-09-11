@@ -605,12 +605,6 @@ ROAd adopts a \textbf{three-tier client-server architecture}:
 
 \hypertarget{component-view}{%
 \section{Component view}\label{component-view}}
-
-The component architecture is presented through complementary views,
-each highlighting a specific group of dependencies. Components appearing
-in multiple figures refer to the same architectural elements.
-Each view shows only the connections relevant to its scope; together,
-the figures describe the component relationships of the system.\\
 The main components and the operations they export are:
 
 \begin{itemize}
@@ -742,14 +736,124 @@ The main components and the operations they export are:
 
 \end{itemize}
 
+\subsection{Component views}
+\label{component-views}
+
+The component architecture is presented through complementary views,
+each highlighting a specific group of dependencies. Components appearing
+in multiple figures refer to the same architectural elements. Each view
+shows only the connections relevant to its scope; together, the figures
+describe the component relationships of the system.
+
+\subsubsection{Client access and API routing}
+
+Figure~\ref{fig:components-client-access} shows how the passenger and
+operator clients access the system through the interfaces exposed by the
+\code{APIGateway}. The gateway acts as the entry point of the backend
+and routes each request to the service responsible for the requested
+operation.
+
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.3\textwidth]
-        {diagrams/component_diagrams/main_components}%
-    }
-    \caption{High-level component diagram of the ROAd system}
-    \label{fig:components}
+    \includegraphics[
+        width=\textwidth,
+        height=0.85\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/client_access_api_routing}
+    \caption{Client access and API routing}
+    \label{fig:components-client-access}
+\end{figure}
+
+
+\subsubsection{Domain-component coordination}
+
+Figure~\ref{fig:components-domain-coordination} focuses on the
+collaboration among ride management, allocation, mode control, fleet
+monitoring, and rebalancing. The \code{RideRequestManager} uses the
+allocation and fleet-monitoring services to assign vehicles, while the
+\code{ModeController} selects the active allocation policy and the
+\code{RebalancingManager} requests vehicle repositioning through the
+\code{FleetMonitor}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.4\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/domain_coordination}
+    \caption{Domain-component coordination through allocation and
+    fleet-monitoring services}
+    \label{fig:components-domain-coordination}
+\end{figure}
+
+
+\subsubsection{Persistence dependencies}
+
+Figure~\ref{fig:components-persistence} shows the components that access
+the shared data tier. Each component uses
+\code{IPersistenceService}, while the
+\code{PersistenceManager} is the only component that communicates
+directly with the database. This centralises data access and supports
+consistent transactions, reservations, and lifecycle updates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.85\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/persistence_dependencies}
+    \caption{Component dependencies on the shared persistence service}
+    \label{fig:components-persistence}
+\end{figure}
+
+
+\subsubsection{Notification production}
+
+Figure~\ref{fig:components-notification} shows the domain components
+that publish events through \code{INotificationService}. The
+\code{NotificationManager} receives these events, persists the relevant
+passenger notifications and operator alerts, and makes them available
+to the delivery mechanisms shown in
+Figure~\ref{fig:components-client-access}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.85\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/notification_event_delivery_view}
+    \caption{Domain components producing events through the notification
+    service}
+    \label{fig:components-notification}
+\end{figure}
+
+
+\subsubsection{External-service dependencies}
+
+Figure~\ref{fig:components-external-services} shows the system
+boundaries involving external services. Backend components access
+routing, traffic, and fleet services through
+\code{IExternalServices}, provided by the
+\code{ExternalServicesGateway}. This prevents provider-specific
+protocols from reaching the domain logic.\\
+The passenger client directly accesses the geocoding provider for
+address search and reverse geocoding, and the road-snapping service to
+associate selected points with drivable roads. These client-side
+interactions do not pass through the backend gateway.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.85\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/external_services_view}
+    \caption{Dependencies on external routing, traffic, geocoding, and
+    fleet services}
+    \label{fig:components-external-services}
 \end{figure}
 \hypertarget{class-view}{%
 \section{Class view}\label{class-view}}
@@ -999,21 +1103,32 @@ receives a rejection notification.
 \hypertarget{deployment-view}{%
 \section{Deployment view}\label{deployment-view}}
 
-FFigure~\ref{fig:deployment} shows the target deployment architecture of
-ROAd. The application server is represented as replicable to indicate
-that the request-processing logic can be replicated while sharing the
-authoritative database. The current prototype, however, runs as a single
-backend instance.
-The prototype uses a locally simulated robotaxi fleet, while demand
-information is read from persisted database records. The WebSocket
-connections and the fleet simulator maintain process-local runtime state;
-therefore, they are not currently shared between multiple backend
-instances. The \code{PersistenceManager} is the only component that
-accesses the database, whereas communication with external routing,
-traffic, and vehicle services is mediated by the
-\code{ExternalServicesGateway}.
-
-\begin{figure}[htbp]
+Figure~\ref{fig:deployment} shows the target deployment architecture of
+ROAd together with the deployment choices adopted by the prototype.
+The application server is represented as replicable to indicate that
+the request-processing logic can be replicated while sharing the
+authoritative database. The current prototype, however, runs as a
+single backend instance.\\
+In the target architecture, the backend communicates with the robotaxi
+fleet through the vehicles' control interface. In the prototype, this
+external fleet is replaced by a simulator running within the backend
+process. Demand information is read from persisted database records
+rather than obtained from an external demand provider.\\
+WebSocket connection registries and the fleet simulator maintain
+process-local runtime state and are therefore not shared among multiple
+backend instances. Periodic activities are also enabled on one instance
+only in the current prototype.\\
+The \code{PersistenceManager} is the only component that accesses the
+database. Backend communication with routing, traffic, and vehicle
+services is mediated by the \code{ExternalServicesGateway}. The
+passenger client instead contacts the geocoding and road-snapping
+providers directly.\\
+Internal communication paths among backend components are intentionally
+omitted from this view, since the purpose of the deployment diagram is
+to show the physical and runtime distribution of the system. Component
+dependencies and service interfaces are detailed in
+Figures~\ref{fig:components-client-access}--\ref{fig:components-external-services}.
+\begin{figure}[H]
     \centering
     \makebox[\textwidth][c]{%
         \includegraphics[width=1.3\textwidth]
