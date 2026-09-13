@@ -1967,21 +1967,7 @@ complement the behavioural tests.
     simulated movement, and client-side presentation logic, including
     ride phases, traffic indicators, and alert classification.
 
-    \item[\textbf{Integration testing.}]
-    Integration tests verify that collaborating components exchange
-    information correctly and preserve system consistency. They cover
-    authentication, persistence, fleet management, allocation, ride
-    management, notifications, mode control, and rebalancing.
-
-    Database-backed tests use isolated PostgreSQL instances to check
-    reservation conflicts, transaction rollback, concurrent updates,
-    and state reconstruction. External-adapter tests exercise the
-    concrete gateway against a controlled HTTP provider implementing
-    the expected OSRM protocol. These tests cover routing responses,
-    caching, malformed responses, provider unavailability, and fallback
-    estimates.
-
-    \item[\textbf{Architecture and contract testing.}]
+\item[\textbf{Architecture and contract testing.}]
     Architecture checks verify module boundaries and the exposure of
     declared service ports. Contract tests compare the generated
     OpenAPI specification with the stored API contract, detecting
@@ -2057,6 +2043,20 @@ testing. Although not a separate testing level in the classical V-model,
 they combine checks from different levels to assess the completeness
 and consistency of each implementation increment.They are retained as regression tests and extended
     when later increments expand previously introduced behaviour.
+
+    \item[\textbf{Integration testing.}]
+    Integration tests verify that collaborating components exchange
+    information correctly and preserve system consistency. They cover
+    authentication, persistence, fleet management, allocation, ride
+    management, notifications, mode control, and rebalancing.
+
+    Database-backed tests use isolated PostgreSQL instances to check
+    reservation conflicts, transaction rollback, concurrent updates,
+    and state reconstruction. External-adapter tests exercise the
+    concrete gateway against a controlled HTTP provider implementing
+    the expected OSRM protocol. These tests cover routing responses,
+    caching, malformed responses, provider unavailability, and fallback
+    estimates.
 
     \item[\textbf{System scenarios and browser testing.}]
     System scenarios exercise the four RASD workflows: immediate
