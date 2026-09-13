@@ -539,6 +539,24 @@ repeatable demonstrations while preserving the existing defaults. \\[0.6em]
 1.12 & August 29, 2026 &
 Added persistent storage and retrieval of operator alerts so that
 recent notifications remain available after a dashboard reload. \\
+\addlinespace[0.6em]
+1.13 & September 1, 2026 &
+Added a check that the account behind an access token still exists.
+Requests from removed accounts are rejected as unauthenticated, and both
+clients return to the login screen when their session is no longer
+accepted. \\[0.6em]
+
+1.14 & September 11, 2026 &
+Made traffic affect the simulated world. When configured, the traffic
+level varies by zone, slows simulated vehicles in congested areas, and
+lengthens travel-time estimates, so that the minimum-ETA strategy can
+prefer a farther but faster vehicle. Assignments can also be explained
+to the operator. \\[0.6em]
+
+1.15 & September 13, 2026 &
+Documented the demonstration environment, which makes the RASD
+scenarios observable and repeatable without changing the decision
+logic. \\
 
 \end{longtable}
 
@@ -619,6 +637,10 @@ The main components and the operations they export are:
   Manages user accounts and issues signed access tokens (R1, R2).
   \textbf{[v1.1]} Public registration creates Passenger accounts;
   Operator accounts are provisioned separately.
+  \textbf{[v1.13]} Token verification also checks that the account
+  behind the token still exists. It reads the shared database and keeps
+  no session state, so every backend instance reaches the same result
+  (NFR3).
 
 \item
   \textbf{RideRequestManager}: Exposes \code{submitImmediate()},
@@ -731,6 +753,12 @@ The main components and the operations they export are:
   vehicles used by the prototype.
   \textbf{[v1.11]} Supports configurable hourly and scripted
   traffic adapters, with the hourly source as the default.
+  \textbf{[v1.14]} When configured, the scripted traffic source provides
+  a level per zone: central zones follow the scripted sequence, while the
+  rest of the city stays Low. An internal slowdown model slows simulated
+  vehicles in congested zones and lengthens travel-time estimates for any
+  routing provider. \code{getTraffic()} still returns a single level,
+  that of the centre.
 
 \end{itemize}
 
@@ -980,6 +1008,16 @@ Passenger notifications are stored for their intended recipient, while
 fleet-wide governance events are persisted as operator alerts.
 The \code{recentAlerts()} operation allows the operator dashboard to
 retrieve these alerts after a disconnection or page reload.
+\\
+\textbf{Allocation explanations {[}v1.14{]}.}
+When enabled, each assignment produces a message for the operator. It
+states which strategy selected the vehicle, its estimated arrival time,
+and, when the nearest candidate was not chosen, how long that candidate
+would have taken. The message is not a subject transition: the
+\code{RideRequestManager} calls \code{update()} directly after the
+assignment. It carries only text and the vehicle, so the dashboard does
+not treat it as a strategy change, and it is not stored among the
+operator alerts.
 
 \hypertarget{runtime-view}{%
 \section{Runtime view}\label{runtime-view}}
@@ -2172,8 +2210,143 @@ and consistency of each implementation increment.They are retained as regression
     operator workflows and relates their observable outcomes to the
     RASD goals. This walkthrough complements the automated checks
     with a review of the system from the users' perspective.
+    The demonstration environment is described in
+    Section~\ref{demonstration-environment}.
 
 \end{description}
+
+\section{Demonstration Environment}
+\label{demonstration-environment}
+
+\textbf{Problem.}
+The behaviours of the RASD scenarios unfold over time scales that cannot
+be shown in a few minutes. Advance bookings are activated fifteen minutes
+before departure, rebalancing runs every ten minutes, and traffic follows
+the local time of day. System tests verify the four scenarios with a
+controlled clock, but a test that runs in seconds cannot be observed.\\
+\textbf{Solution.}
+The demonstration changes the world that the system observes, never the
+logic that decides. It relies on two groups of elements.
+
+\begin{itemize}
+
+\item
+  \textbf{Tools outside the system.} They are not deployed. A demonstration
+  runner prepares the database, applies the scenario configuration,
+  starts the backend and both clients, and reports what to observe. A
+  scenario dataset stages a demand event at the San Siro stadium. A
+  ride-request generator submits passenger requests through the public
+  API. A browser automation script replays the immediate-ride scenario
+  as a regression check.
+
+\item
+  \textbf{Configuration points inside the system.} The time step of the
+  fleet simulator; the cadence of periodic activities, the activation
+  lead time of advance bookings, and the traffic source \textbf{[v1.11]};
+  the per-zone traffic effect and the allocation explanations
+  \textbf{[v1.14]}. Each point defaults to its normal-operation value, so
+  an installation that ignores them behaves as before.
+
+\end{itemize}
+
+% Figure~\ref{fig:demonstration-environment} shows both groups and their
+% relations with the components of the system.
+%
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[
+%         width=\textwidth,
+%         height=0.45\textheight,
+%         keepaspectratio
+%     ]{diagrams/component_diagrams/demonstration_environment}
+%     \caption{Demonstration environment: tools outside the system and
+%     configuration points inside it.}
+%     \label{fig:demonstration-environment}
+% \end{figure}
+
+The four scenarios are summarised below.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.17}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.27}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.38}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.18}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Scenario
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Configuration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Observable behaviour
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requirements
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Immediate ride &
+Faster simulated time. &
+A passenger request is assigned; the vehicle approaches, picks up, and
+completes the ride, and both clients update without reloading. &
+R3, R5, R6, R7, NFR2 \\[0.6em]
+
+Advance booking &
+Activation one minute before departure, checked every ten seconds. &
+The booking waits without a vehicle, then is activated and assigned
+automatically before its departure time. &
+R4, R5, R6 \\[0.6em]
+
+Traffic-aware allocation &
+Scripted traffic in the centre, slowdown factors, allocation
+explanations, generated requests. &
+Medium traffic only raises a suggestion. High traffic switches to
+minimum ETA, which assigns some pickups to farther but faster vehicles.
+The strategy is kept at Medium and restored at Low. &
+R5, R8, R12, NFR9 \\[0.6em]
+
+Fleet rebalancing &
+Rebalancing every fifteen seconds; stadium event dataset. &
+Idle vehicles from other zones move toward the stadium, one per cycle,
+and become available again on arrival. &
+R10, R11, G9 \\
+
+\end{longtable}
+
+\noindent
+\textbf{Why.}
+\begin{itemize}
+
+\item
+  \textbf{Configuration instead of demonstration code.} Periodic
+  activities keep their triggers and only their cadence changes, so what
+  is shown is what runs in normal operation.
+
+\item
+  \textbf{Substitution behind an existing interface.} The scripted
+  traffic source is a second adapter behind the same interface as the
+  hourly one, which exercises the substitutability required by NFR8.
+
+\item
+  \textbf{Traffic confined to the gateway.} The per-zone level never
+  leaves the \code{ExternalServicesGateway}. One slowdown model drives
+  both vehicles and estimates, so an estimated arrival time matches how
+  the simulated vehicle moves.
+
+\item
+  \textbf{Requests through the public interface.} Generated requests
+  pass through authentication, validation, allocation, reservation, and
+  notification like any request from the passenger application.
+
+\item
+  \textbf{Staged data declared as such.} The stadium event and the
+  generated requests are scenario data, declared in the installation
+  instructions. The fixed seed makes the sequence of requests identical
+  at every run; the selected vehicles may differ slightly between runs,
+  because the system runs in real time and travel-time estimates depend
+  on the configured routing provider.
+
+\end{itemize}
 
 \section{Verification of Quality Requirements}
 \label{quality-requirements-verification}
