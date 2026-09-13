@@ -425,8 +425,6 @@ Abbreviations}\label{definitions-acronyms-abbreviations}}
 \item
   \textbf{API} (Application Programming Interface)
 \item
-  \textbf{REST} (Representational State Transfer)
-\item
   \textbf{MVC} (Model-View-Controller)
 \item
   \textbf{ETA} (Estimated Time of Arrival)
@@ -760,7 +758,7 @@ operation.
         height=0.85\textheight,
         keepaspectratio
     ]{diagrams/component_diagrams/client_access_api_routing}
-    \caption{Client access and API routing}
+    \caption{Client access and API routing.}
     \label{fig:components-client-access}
 \end{figure}
 
@@ -783,7 +781,7 @@ allocation and fleet-monitoring services to assign vehicles, while the
         keepaspectratio
     ]{diagrams/component_diagrams/domain_coordination}
     \caption{Domain-component coordination through allocation and
-    fleet-monitoring services}
+    fleet-monitoring services.}
     \label{fig:components-domain-coordination}
 \end{figure}
 
@@ -804,7 +802,7 @@ consistent transactions, reservations, and lifecycle updates.
         height=0.85\textheight,
         keepaspectratio
     ]{diagrams/component_diagrams/persistence_dependencies}
-    \caption{Component dependencies on the shared persistence service}
+    \caption{Component dependencies on the shared persistence service.}
     \label{fig:components-persistence}
 \end{figure}
 
@@ -826,7 +824,7 @@ Figure~\ref{fig:components-client-access}.
         keepaspectratio
     ]{diagrams/component_diagrams/notification_event_delivery_view}
     \caption{Domain components producing events through the notification
-    service}
+    service.}
     \label{fig:components-notification}
 \end{figure}
 
@@ -853,7 +851,7 @@ interactions do not pass through the backend gateway.
     ]{diagrams/component_diagrams/external_services_view}
     \caption{Dependencies on external routing, traffic, geocoding, and
     fleet services}
-    \label{fig:components-external-services}
+    \label{fig:components-external-services.}
 \end{figure}
 \hypertarget{class-view}{%
 \section{Class view}\label{class-view}}
@@ -993,16 +991,32 @@ exchanged among components to accomplish the most relevant tasks.
 \hypertarget{immediate-ride-request}{%
 \subsubsection{\texorpdfstring{Immediate ride request}{Immediate ride request}}
 \label{immediate-ride-request}}
-\ddfigure{diagrams/sequence_diagrams/immediate_ride_request}{Sequence diagram of the immediate ride request and allocation flow.
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/immediate_ride_request}%
+    }
+    \caption{Sequence diagram of the immediate ride request and allocation flow.
 including request persistence, robotaxi selection, assignment, and
-passenger notification (R3, R5, R6).}{fig:seq_immediate_ride}
+passenger notification (R3, R5, R6).}
+    \label{fig:seq_immediate_ride}
+\end{figure}
 
 \hypertarget{automatic-strategy-switching}{%
 \subsubsection{\texorpdfstring{Automatic strategy switching}{Automatic strategy switching}}
 \label{automatic-strategy-switching}}
-\ddfigure{diagrams/sequence_diagrams/seq_auto_strategy_switch}{Sequence diagram of the automatic strategy switching flow, showing
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/seq_auto_strategy_switch}%
+    }
+    \caption{Sequence diagram of the automatic strategy switching flow, showing
 hysteresis-based strategy selection in Auto Mode and the priority of
-human manual override (R12, R13, NFR9, NFR10).}{fig:seq_auto_strategy_switch}
+human manual override (R12, R13, NFR9, NFR10).}
+    \label{fig:seq_auto_strategy_switch}
+\end{figure}
 \noindent
 \textbf{Traffic hysteresis rule {[}v1.1{]}.}
 In Auto Mode, \code{ModeController} evaluates the last observed traffic
@@ -1028,36 +1042,58 @@ the last observed traffic level using the same rule. If the level is
 \hypertarget{dynamic-fleet-rebalancing}{%
 \subsubsection{\texorpdfstring{Dynamic fleet rebalancing}{Dynamic fleet rebalancing}}
 \label{dynamic-fleet-rebalancing}}
-\ddfigure{diagrams/sequence_diagrams/seq_rebalancing}{Sequence diagram of the dynamic fleet rebalancing flow, including demand
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/seq_rebalancing}%
+    }
+    \caption{Sequence diagram of the dynamic fleet rebalancing flow, including demand
 analysis, available vehicle selection, and route command dispatch (R10,
-R11).}{fig:seq_rebalancing}
+R11).}
+    \label{fig:seq_rebalancing}
+\end{figure}
+
 \noindent
 \textbf{Realised rebalancing cycle {[}v1.5{]}.}
-The rebalancing planning cycle reads historical demand samples and active
-events from the persistence layer and selects eligible idle robotaxis for
-repositioning. It does not invoke \code{getDemandData()}: demand
-information is obtained through \code{IPersistenceService}. Traffic data is
-not used by this process, since it only affects the allocation strategy
-managed by the \code{ModeController}.
-For each selected robotaxi, the system requests the
-\code{REBALANCING} transition, records the rebalancing action, and sends a
-route command through \code{ExternalServicesGateway}. The command returns
-route information, such as distance and duration.
+The rebalancing planning cycle periodically retrieves demand information
+from the persistence layer and the set of available robotaxis from the
+\code{FleetMonitor}. In the sequence diagram, the
+\code{getDemandData()} operation abstracts the underlying persistence
+queries used to collect historical demand samples and active events.
+Traffic data is not used by this process, since it only affects the
+allocation strategy managed by the \code{ModeController}.
+The \code{RebalancingManager} analyses demand and fleet availability,
+identifies deficit zones, and selects suitable robotaxis and target zones.
+For each selected robotaxi, the system requests the transition to
+\code{REBALANCING}, records the corresponding rebalancing action, and sends
+a route command towards the target zone through the
+\code{ExternalServicesGateway}. A
+\code{RebalancingStartedEvent} is then propagated to the operator interface
+through the notification mechanism. If no redistribution is required, the
+current fleet distribution is maintained.
 \textbf{{[}v1.8{]}}
-The completion of an ongoing repositioning is handled by a separate
-telemetry cycle, independently of the ten-minute demand-planning cycle.
-\code{RebalancingScheduler.completeArrivedVehicles()} reads fleet
-telemetry and invokes \code{completeArrivedRebalancing()} for vehicles that
-have reached their target zone. The operation asks \code{FleetMonitor} to
-complete the transition to \code{AVAILABLE} and update the vehicle's
-recorded zone.
+The completion of an ongoing repositioning is handled independently from
+the demand-planning cycle and is therefore not shown in the sequence
+diagram. A separate telemetry cycle detects robotaxis that have reached
+their target zone and completes the rebalancing operation by transitioning
+the vehicle back to \code{AVAILABLE} and updating its recorded zone.
 \hypertarget{advannce-booking-flow}{%
 \subsubsection{\texorpdfstring{Advance booking flow}{Advance booking flow}}
 \label{dynamic-fleet-rebalancing}}
-\ddfigure{diagrams/sequence_diagrams/seq_advance_booking}{Sequence diagram of the advance booking flow, including request
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/seq_advance_booking}%
+    }
+    \caption{Sequence diagram of the advance booking flow, including request
 validation, future vehicle allocation, conflict prevention, atomic
-booking and robotaxi reservation, and passenger notification (R4, NFR4,
-C1).}{fig:seq_advance_booking}
+booking and robotaxi reservation, and passenger notification\\
+(R4, NFR4,C1).}
+    \label{fig:seq_advance_booking}
+\end{figure}
+
 \noindent
 \textbf{Booking candidate selection {[}v1.2{]}.}
 Advance bookings use \code{getBookableRobotaxis()}, which considers
@@ -1087,7 +1123,7 @@ reservation is released.
 \textbf{{[}v1.1{]}}}{Advance booking activation {[}v1.1{]}}}\label{advance-booking-activation-v1.1}}
 
 Advance bookings are activated shortly before their scheduled pickup
-time by a periodically invocation of\code{AdvanceBookingActivator.runOnce()}, owned by the
+time by a periodically invocation of \code{AdvanceBookingActivator.runOnce()}, owned by the
 \code{RideRequestManager}.
 For each due booking, the system verifies whether the reserved robotaxi
 is still eligible. If so, it is assigned to the ride and the normal
@@ -1095,9 +1131,15 @@ ride lifecycle begins. Otherwise, the system selects another eligible
 vehicle through \code{AllocationManager.allocate()}. If no suitable
 robotaxi is available, the booking is rejected and the Passenger is
 notified.
-
-\ddfigurestar{diagrams/sequence_diagrams/advance_booking_activation}{Advance booking activation [v1.1].}
-
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/advance_booking_activation}%
+    }
+    \caption{Advance booking activation [v1.1].}
+    \label{fig:seq_advance_booking_activation}
+\end{figure}
 \hypertarget{cancellation-v1.1}{%
 \subsubsection{\texorpdfstring{Cancellation
 \textbf{{[}v1.1{]}}}{Cancellation {[}v1.1{]}}}\label{cancellation-v1.1}}
@@ -1107,22 +1149,34 @@ The Passenger can cancel a ride request before the ride begins.
 to the Passenger and is still cancellable.
 If the request has no assigned robotaxi, as in an advance booking that has
 not yet been activated, no route is revoked and no vehicle assignment is
-released. The active reservation is released through
-\code{PersistenceManager}, while the booking record is closed by setting
-its \code{closedAt} timestamp and clearing its reservation reference.
+released. Any active reservation is released through the
+\code{PersistenceManager}, while the corresponding booking, if present, is
+closed.
 If a robotaxi has already been assigned and its current state allows
-cancellation, the system first revokes its route through
-\code{ExternalServicesGateway} and then asks \code{FleetMonitor} to release
-the assignment and return the vehicle to \code{AVAILABLE}. The request is
-then marked as \code{CANCELLED}, its reservation is released, and the
-corresponding \code{Ride} is updated and the Passenger is notified.
-Booking and reservation records are therefore retained for historical
-purposes rather than deleted. A booking is closed and its reservation is
-released, making the corresponding time window available again.
+cancellation, the system first revokes its route through the
+\code{ExternalServicesGateway} and then asks the \code{FleetMonitor} to
+release the assignment and return the vehicle to \code{AVAILABLE}.
+The system then releases any active reservation, closes the associated
+advance booking if present, and marks the ride request as
+\code{CANCELLED}.
+Booking and reservation records are retained for historical purposes rather
+than deleted. Releasing the reservation makes the corresponding time window
+available again.
+The associated ride state and Passenger notification are updated through the
+system's internal notification mechanism, which is not shown in the sequence
+diagram.
 If the cancellation is not allowed in the current robotaxi state, the
 request, booking, and reservation remain unchanged, and the Passenger
-receives a rejection notification.
-\ddfigurestar{diagrams/sequence_diagrams/cancellation}{Cancellation procedure [v1.1].}
+receives a cancellation rejection.
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/cancellation}%
+    }
+    \caption{Cancellation procedure [v1.1].}
+    \label{fig:cancellation_procedure}
+\end{figure}
 \hypertarget{deployment-view}{%
 \section{Deployment view}\label{deployment-view}}
 
@@ -1150,14 +1204,14 @@ Internal communication paths among backend components are intentionally
 omitted from this view, since the purpose of the deployment diagram is
 to show the physical and runtime distribution of the system. Component
 dependencies and service interfaces are detailed in
-Figures~\ref{fig:components-client-access}--\ref{fig:components-external-services}.
+Figures~\ref{fig:components-client-access}--\ref{fig:components-external-services.}.
 \begin{figure}[H]
     \centering
     \makebox[\textwidth][c]{%
         \includegraphics[width=1.3\textwidth]
         {diagrams/component_diagrams/deployment_view}%
     }
-    \caption{Deployment view of the three-tier architecture}
+    \caption{Deployment view of the three-tier architecture.}
     \label{fig:deployment}
 \end{figure}
 
@@ -1207,7 +1261,7 @@ recipients and supports dynamic client connections. Notifications are
 sent after the corresponding state or status change has been persisted.
 
 \subsection{State - robotaxi lifecycle}
-
+\label{sec:state-pattern}
 \textbf{Problem.}
 A robotaxi can perform different operations depending on its current
 lifecycle state, and only specific transitions are valid from each
@@ -1221,11 +1275,16 @@ The \code{Robotaxi} object delegates lifecycle operations to its current
 \code{MaintenanceState}. Invalid operations raise an
 \code{IllegalTransitionError}. The complete lifecycle is shown in
 Figure~\ref{fig:state_robotaxi}.
-
-\ddfigure{diagrams/finite_state_machine/fsm_robotaxi_state}
-{Design-level state machine of the Robotaxi realised through the State
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.25\textwidth]
+        {diagrams/finite_state_machine/fsm_robotaxi_state}%
+    }
+    \caption{Design-level state machine of the Robotaxi realised through the State
 pattern.}
-{fig:state_robotaxi}
+    \label{fig:state_robotaxi}
+\end{figure}
 \noindent
 \textbf{Why.}
 The State pattern is used because the operations permitted on a
@@ -1242,28 +1301,38 @@ and consistent with the persisted state.
 \textbf{Problem.}
 The system interacts with external providers and must support different
 client interfaces without exposing provider-specific details to the
-business logic. The frontend must also separate data management,
-presentation, and user interaction responsibilities.\\
+business logic. The frontend must separate data management, presentation,
+and user-interaction responsibilities. Moreover, some domain objects must
+be reconstructed from persisted state without coupling the persistence
+layer to their concrete implementations.\\
 \textbf{Solution.}
-The \code{ExternalServicesGateway} combines the
-\textbf{Facade} and \textbf{Adapter} patterns to provide a uniform
-interface to mapping, traffic, routing, telemetry, and vehicle services.
-Provider-specific protocols are therefore isolated from the backend
-components.\\
-The passenger and operator clients are implemented with React and follow
-the \textbf{MVC} principle by separating observable application state, rendered
-views, and user-interaction logic. This represents a separation of
-responsibilities in the frontend rather than a strict hierarchy of
+\textbf{{[}v1.4{]}} The \code{ExternalServicesGateway} combines the
+\textbf{Facade} and \textbf{Adapter} patterns. It exposes a uniform
+interface to external mapping, traffic, routing, telemetry, and vehicle
+services, while provider-specific adapters isolate the corresponding
+protocols and implementations from the business logic.\\
+\textbf{{[}v1.6{]}} The passenger and operator clients are implemented
+with React and follow the \textbf{MVC} principle by separating observable
+application state, rendered views, and user-interaction logic. This is a
+separation of frontend responsibilities rather than a strict hierarchy of
 MVC classes.\\
-Backend services are created through \textbf{dependency injection}, with
-one instance of each service per backend process where required by the
-implementation. This provides process-local behaviour similar to the
-Singleton pattern, without introducing a separate Singleton implementation.\\
+\textbf{{[}v1.1{]}} A \textbf{Factory} supports the realisation of the
+State pattern described in Section~\ref{sec:state-pattern}. The
+\code{RobotaxiStateFactory} reconstructs the appropriate concrete
+\code{RobotaxiState} from the state value stored in persistence, keeping
+object creation outside the persistence layer and the \code{Robotaxi}
+context.\\
+Backend services are managed through \textbf{dependency injection}.
+NestJS provides the required service instances within each backend process,
+so components such as the \code{FleetMonitor} and
+\code{NotificationManager} can maintain process-local runtime state without
+requiring an explicit Singleton implementation.\\
 \textbf{Why.}
-These styles isolate external dependencies, keep the core logic
-independent of provider-specific protocols, and separate frontend
-responsibilities. They also simplify the evolution and testing of both
-the clients and the backend services.
+These patterns and styles isolate external dependencies, keep the core
+logic independent of provider-specific protocols, separate frontend
+responsibilities, and centralise the reconstruction of state-dependent
+behaviour. Dependency injection also keeps component dependencies explicit
+and simplifies replacement and testing of their implementations.
 
 \hypertarget{user-interface-design}{%
 \chapter{User Interface Design}\label{user-interface-design}}
@@ -1310,7 +1379,7 @@ pickup date and time must also be specified.
         keepaspectratio
     ]{images/passenger_gui/select_service.png}
 
-    \caption{Passenger interface for selecting pickup and destination and choosing the ride service}
+    \caption{Passenger interface for selecting pickup and destination and choosing the ride service.}
     \label{fig:passenger-request-interface}
 \end{figure}
 \noindent
@@ -1340,7 +1409,7 @@ the same live ride flow used for immediate requests.
         keepaspectratio
     ]{images/passenger_gui/booking_panel.png}
 
-   \caption{Passenger interface for scheduling an advance ride, receiving booking confirmation, and managing scheduled bookings}
+   \caption{Passenger interface for scheduling an advance ride, receiving booking confirmation, and managing scheduled bookings.}
     \label{fig:advance-ride-request}
 \end{figure}
 \noindent
@@ -1376,7 +1445,7 @@ the ride is in progress.
         keepaspectratio
     ]{images/passenger_gui/taxi2destination.png}
 
-    \caption{Passenger interface showing the assigned robotaxi approaching the pickup location, the draggable ride status panel, and the robotaxi travelling toward the destination}
+    \caption{Passenger interface showing the assigned robotaxi approaching the pickup location, the draggable ride status panel, and the robotaxi travelling toward the destination.}
     \label{fig:passenger-request-interface}
 \end{figure}
 \noindent
@@ -1414,7 +1483,7 @@ corresponding robotaxis and focus a selected vehicle on the map.
             keepaspectratio
         ]{images/operator_gui/start_page.png}%
     }
-    \caption{Fleet Operator Dashboard for live fleet monitoring}
+    \caption{Fleet Operator Dashboard for live fleet monitoring.}
     \label{fig:operator-main-dashboard}
 \end{figure}
 \noindent
@@ -1460,7 +1529,7 @@ to focus the corresponding vehicle on the map.
         height=0.55\textheight,
         keepaspectratio
     ]{images/operator_gui/alert_log_panels.png}
-    \caption{Strategy control, operator alerts, and live operational events}
+    \caption{Strategy control, operator alerts, and live operational events.}
     \label{fig:operator-control-monitoring}
 \end{figure}
 \noindent
@@ -1478,7 +1547,7 @@ maintenance transition is currently unavailable.
         height=0.5\textheight,
         keepaspectratio
     ]{images/operator_gui/maintenance_panel.png}
-    \caption{Robotaxi selection and maintenance panel}
+    \caption{Robotaxi selection and maintenance panel.}
 \end{figure}
 
 \begin{figure}[H]
@@ -1488,7 +1557,7 @@ maintenance transition is currently unavailable.
         height=0.5\textheight,
         keepaspectratio
     ]{images/operator_gui/maintenance_set.png}
-    \caption{Robotaxi set to maintenance}
+    \caption{Robotaxi set to maintenance.}
 \end{figure}
 
 \begin{figure}[H]
@@ -1498,7 +1567,7 @@ maintenance transition is currently unavailable.
         height=0.5\textheight,
         keepaspectratio
     ]{images/operator_gui/maintenance_completed.png}
-    \caption{Robotaxi maintenance completion}
+    \caption{Robotaxi maintenance completion.}
     \label{fig:operator-maintenance-interface}
 \end{figure}
 \noindent
