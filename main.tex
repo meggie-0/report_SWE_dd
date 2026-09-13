@@ -908,9 +908,17 @@ are \code{AvailableState}, \code{AssignedState},
 state defines the behaviour of the transitions that are legal from it,
 while calls for any other transition are rejected. This makes illegal
 transitions impossible by construction (NFR5).
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.3\textwidth]
+        {diagrams/class_diagrams/robotaxi_state}%
+    }
+    \caption{Class diagram of the Robotaxi. The State pattern applied to the vehicle
+lifecycle.}
+    \label{fig:class_state}
+\end{figure}
 
-\ddfigure{diagrams/class_diagrams/robotaxi_state}{Class diagram of the Robotaxi. The State pattern applied to the vehicle
-lifecycle.}{fig:class_state}
 
 \hypertarget{notificationmanager-observer}{%
 \subsection{NotificationManager}\label{notificationmanager-observer}}
