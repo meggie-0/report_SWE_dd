@@ -2249,37 +2249,37 @@ logic that decides. It relies on two groups of elements.
 
 \end{itemize}
 
-% Figure~\ref{fig:demonstration-environment} shows both groups and their
-% relations with the components of the system.
-%
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[
-%         width=\textwidth,
-%         height=0.45\textheight,
-%         keepaspectratio
-%     ]{diagrams/component_diagrams/demonstration_environment}
-%     \caption{Demonstration environment: tools outside the system and
-%     configuration points inside it.}
-%     \label{fig:demonstration-environment}
-% \end{figure}
+Figure~\ref{fig:demonstration-environment} shows both groups and their
+relations with the components of the system.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.45\textheight,
+        keepaspectratio
+    ]{diagrams/component_diagrams/demonstration_environment}
+    \caption{Demonstration environment: tools outside the system and
+    configuration points inside it.}
+    \label{fig:demonstration-environment}
+\end{figure}
 
 The runner always starts from a known database state. The automated
 replay ends after checking the scenario; otherwise the stack stays
 active, and the scheduled activities, the request generator, and the
 people using the clients act at the same time.
-% Figure~\ref{fig:demonstration-run} shows the complete run.
+Figure~\ref{fig:demonstration-run} shows the complete run.
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[
-%         width=\textwidth,
-%         height=0.75\textheight,
-%         keepaspectratio
-%     ]{diagrams/activity_diagrams/demonstration_run}
-%     \caption{Activity diagram of a demonstration run.}
-%     \label{fig:demonstration-run}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=\textwidth,
+        height=0.75\textheight,
+        keepaspectratio
+    ]{diagrams/activity_diagrams/demonstration_run}
+    \caption{Activity diagram of a demonstration run.}
+    \label{fig:demonstration-run}
+\end{figure}
 
 The four scenarios are summarised below.
 
@@ -2335,34 +2335,34 @@ Inside the \code{ExternalServicesGateway}, two traffic sources implement
 the same abstract class, and configuration instantiates exactly one of
 them. A single \code{TrafficSlowdown} reads the level at each point and
 is used both by the fleet simulator and by travel-time estimates.
-% Figure~\ref{fig:traffic-sources} shows these classes.
+Figure~\ref{fig:traffic-sources} shows these classes.
 During high traffic, the minimum-ETA strategy compares estimates that
 already include the slowdown along each route, and in the demonstration
 the operator receives an explanation of the choice.
-% Figure~\ref{fig:demo-traffic-allocation} shows this flow for a
-% generated request.
+Figure~\ref{fig:demo-traffic-allocation} shows this flow for a
+generated request.
 
-% \begin{figure}[H]
-%     \centering
-%     \makebox[\textwidth][c]{%
-%         \includegraphics[width=1.2\textwidth]
-%         {diagrams/class_diagrams/traffic_sources}%
-%     }
-%     \caption{Class diagram of the traffic sources and of the slowdown
-%     model used by the demonstration (NFR8).}
-%     \label{fig:traffic-sources}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/class_diagrams/traffic_sources}%
+    }
+    \caption{Class diagram of the traffic sources and of the slowdown
+    model used by the demonstration (NFR8).}
+    \label{fig:traffic-sources}
+\end{figure}
 
-% \begin{figure}[H]
-%     \centering
-%     \makebox[\textwidth][c]{%
-%         \includegraphics[width=1.2\textwidth]
-%         {diagrams/sequence_diagrams/seq_demo_traffic_allocation}%
-%     }
-%     \caption{Sequence diagram of a generated ride request allocated
-%     under high traffic, with the allocation explanation (R5, R12).}
-%     \label{fig:demo-traffic-allocation}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.2\textwidth]
+        {diagrams/sequence_diagrams/seq_demo_traffic_allocation}%
+    }
+    \caption{Sequence diagram of a generated ride request allocated
+    under high traffic, with the allocation explanation (R5, R12).}
+    \label{fig:demo-traffic-allocation}
+\end{figure}
 
 \noindent
 \textbf{Why.}
